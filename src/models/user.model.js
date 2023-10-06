@@ -61,7 +61,7 @@ var customerSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true,
-    collection: COLLECTION_NAME
+    collection: 'customers'
 });
 
 var staffSchema = new mongoose.Schema({

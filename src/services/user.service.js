@@ -31,14 +31,14 @@ class User {
         this.user_attributes = user_attributes;
     }
 
-    static async createUser(id) {
+    async createUser(id) {
         const newUser = await user.create({...this, _id: id});
         return newUser;
     }
 }
 
 class Customer extends User {
-    static async createUser() {
+    async createUser() {
         const newCustomer = await customer.create(this.user_attributes);
         if (!newCustomer) throw new BadRequestError("Error creating customer");
 
@@ -49,7 +49,7 @@ class Customer extends User {
 }
 
 class Staff extends User {
-    static async createUser() {
+    async createUser() {
         const newCustomer = await staff.create(this.user_attributes);
         if (!newCustomer) throw new BadRequestError("Error creating customer");
 
@@ -60,7 +60,7 @@ class Staff extends User {
 }
 
 class Manager extends User {
-    static async createUser() {
+    async createUser() {
         const newCustomer = await manager.create(this.user_attributes);
         if (!newCustomer) throw new BadRequestError("Error creating customer");
 

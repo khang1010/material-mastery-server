@@ -1,5 +1,6 @@
 'use strict';
 
+const asyncHandler = require("../helpers/asyncHandler");
 const { findByKey } = require("../models/repositories/apiKey");
 
 const HEADER = {
@@ -31,6 +32,11 @@ const apiKey = async (req, res, next) => {
         
     } 
 }
+
+const authentication = asyncHandler(async (req, res, next) => {
+    const userId = req.headers[HEADER.CLIENT_ID];
+    
+})
 
 const permission = (permission) => {
     return (req, res, next) => {
