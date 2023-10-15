@@ -3,8 +3,13 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const compression = require('compression');
 const instanceMongoDb = require('./dbs/init-mongodb');
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
+const swaggerDocument = require('./utils/swagger')
 require('dotenv').config();
 const app = express();
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // init middleware
 app.use(morgan("dev")) // show details request package

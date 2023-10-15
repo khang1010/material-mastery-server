@@ -3,6 +3,8 @@
 const asyncHandler = require("../helpers/asyncHandler");
 const { findByKey } = require("../models/repositories/apiKey");
 const JWT = require('jsonwebtoken');
+const { findKeyToken } = require("../models/repositories/keyToken");
+const { AuthenticationError, NotFoundError } = require("../core/error-response");
 
 const HEADER = {
     API_KEY: 'x-api-key',
@@ -89,8 +91,40 @@ const checkApiKeyV2 = async (req, res, next) => {
 }
 
 const authentication = asyncHandler(async (req, res, next) => {
-    const userId = req.headers[HEADER.CLIENT_ID];
-    
+    const userId = req.headers[HEADER.CLIENT_ID]
+    if (!userId) throw new NotFoundError("User not found")
+
+    const keyStore = await findKeyToken({user: userId});
+    if (!keyStore) throw new NotFoundError("Key not found")
+
+    if (req.headers[HEADER.REFRESHTOKEN]) {
+        const refreshToken = req.headers[HEADER.REFRESHTOKEN];
+        try {
+            const decodeUser = JWT.verify(refreshToken, keyStore.publicKey);
+            if (userId !== decodeUser.userId) throw new AuthenticationError("Invalid User")
+            req.keyStore = keyStore
+            req.refreshToken = refreshToken
+            req.user = decodeUser
+            return next()
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const accessToken = req.headers[HEADER.AUTHORIZATION]
+    console.log("AccessToken: ", accessToken)
+    if (!accessToken) throw new AuthenticationError("Invalid Token")
+
+    try {
+        const decodeUser = JWT.verify(accessToken, keyStore.publicKey);
+        if (userId !== decodeUser.userId) throw new AuthenticationError("Invalid User")
+        req.keyStore = keyStore
+        req.user = decodeUser
+        return next()
+    } catch (error) {
+        throw error
+    }
+
 })
 
 const permission = (permission) => {
@@ -114,5 +148,6 @@ module.exports = {
     checkApiKeyV1,
     checkApiKeyV2,
     permission,
+    authentication,
     verifyJWT,
 }
