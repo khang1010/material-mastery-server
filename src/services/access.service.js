@@ -6,9 +6,11 @@ const crypto = require('crypto');
 const {
   createTokenPair,
   createOrUpdateKeyToken,
+  removeByIdToken,
 } = require('../models/repositories/keyToken');
 const { user } = require('../models/user.model');
 const UserFactory = require('./user.service');
+const { findByEmailOrUsername } = require('../models/repositories/user');
 
 class AccessService {
   static signUp = async ({
@@ -90,6 +92,61 @@ class AccessService {
       tokenPair,
     };
   };
+
+  static signIn = async ({ userInfo, password }) => {
+    const foundUser = await findByEmailOrUsername(userInfo);
+    if (!foundUser) throw new BadRequestError('User not found');
+    const isMatch = await bcrypt.compare(password, (await foundUser).password);
+    if (!isMatch) throw new BadRequestError('Wrong password');
+    const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: 'pkcs1',
+        format: 'pem',
+      },
+      privateKeyEncoding: {
+        type: 'pkcs1',
+        format: 'pem',
+      },
+    });
+    //create token pair
+    const payloadToken = {
+      userId: (await foundUser)._id,
+      username: foundUser.username,
+      passwordHash: foundUser.password,
+      email: foundUser.email,
+      display_name: foundUser.display_name,
+      phone: foundUser.phone,
+      roles: foundUser.roles,
+      user_attributes: foundUser.user_attributes
+    }
+    const tokenPair = await createTokenPair(
+      payloadToken,
+      publicKey,
+      privateKey
+    );
+    if (!tokenPair) throw new BadRequestError('Create token pair failed');
+
+    if (
+      !(await createOrUpdateKeyToken(
+        (
+          await foundUser
+        )._id,
+        publicKey,
+        privateKey,
+        tokenPair.refreshToken
+      ))
+    )
+      throw new BadRequestError('Create key token failed');
+
+    return {
+      shop: foundUser,
+      tokenPair,
+    };
+  }
+  static signOut = async (keystore) => {
+    return await removeByIdToken(keystore._id);
+  }
 }
 
 module.exports = AccessService;

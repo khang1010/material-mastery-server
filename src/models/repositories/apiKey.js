@@ -3,18 +3,18 @@
 const apiKeyModel = require("../apiKey.model");
 const crypto = require("crypto");
 
-const createApiKey = async (permissions) => {
+const createApiKey = async (permission) => {
     const objKey = await apiKeyModel.create({
         key: crypto.randomBytes(64).toString("hex"),
-        permissions: permissions,
+        permissions: [permission],
     });
     return objKey.key;
 }
 
-const getApiKey = async (permissions) => {
+const getApiKey = async (permission) => {
     const apiKey = await apiKeyModel.findOne({permissions: permission}).lean();
     if (!apiKey) {
-        return await createApiKey(permissions);
+        return await createApiKey(permission);
     }
     return apiKey.key;
 }

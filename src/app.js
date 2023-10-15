@@ -21,8 +21,6 @@ app.use('/', require('./routes/index'))
 // init database
 instanceMongoDb
 
-// checkOverloads()
-
 // handle error
 app.use((req, res, next) => {
     const error = new Error('Not found');

@@ -1,8 +1,10 @@
 'use strict';
 const mongoose = require('mongoose');
-const { db: {host, name, port}} = require('../configs/config-mongodb');
+const { db: {host, name, port, password}} = require('../configs/config-mongodb');
 
-const connectionString = `mongodb://${host}:${port}/${name}`;
+const username = encodeURIComponent(host);
+const pass = encodeURIComponent(password);
+const connectionString = `mongodb+srv://${username}:${pass}@cluster0.2ujc3tr.mongodb.net/${name}?retryWrites=true&w=majority`;
 
 // Singleton connect database
 class Database {
@@ -11,16 +13,16 @@ class Database {
   }
 
   // connect to the database function
-  connect(type = 'mongodb') {
+  async connect(type = 'mongodb') {
     if (1 === 1) {
       mongoose.set('debug', true);
       mongoose.set('debug', { color: true });
     } // debug for dev
 
-    mongoose
+    await mongoose
       .connect(connectionString)
-      .then((_) => console.log('Connected to MongoDB'))
-      .catch((error) => console.log('Failed to connect to MongoDB'));
+      .then((_) => console.log(`Connected to MongoDB with host: ${host}`))
+      .catch((error) => console.log(`Failed to connect to MongoDB with error: ${error}`));
   }
 
   static getInstance() {

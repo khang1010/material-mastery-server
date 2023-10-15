@@ -25,6 +25,10 @@ const findKeyToken = async (filter) => {
     return await keyTokenModel.findOne(filter).lean();
 }
 
+const removeByIdToken = async (id) => {
+    return await keyTokenModel.findByIdAndDelete(id);
+}
+
 const createTokenPair = async (payload, publicKey, privateKey) => {
     try {
         const accessToken = await JWT.sign(payload, privateKey, {
@@ -57,4 +61,5 @@ module.exports = {
     createTokenPair,
     createOrUpdateKeyToken,
     findKeyToken,
+    removeByIdToken,
 }
