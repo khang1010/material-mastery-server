@@ -226,7 +226,7 @@ const swaggerObj = {
                             },
                             user_attributes: {
                               type: 'object',
-                              // Add more properties specific to user attributes
+                              'x-comment': 'Add more properties specific to user attributes',
                             },
                             _id: {
                               type: 'string',

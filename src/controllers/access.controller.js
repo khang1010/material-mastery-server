@@ -19,7 +19,7 @@ class AccessController {
     static signOut = async (req, res, next) => {
         new OkResponse({
             message: "Sign out successfully",
-            metadata: await AccessService.signOut(req.keystore),
+            metadata: await AccessService.signOut(req.keyStore),
         }).send(res);
     }
 }

@@ -96,6 +96,7 @@ const authentication = asyncHandler(async (req, res, next) => {
 
     const keyStore = await findKeyToken({user: userId});
     if (!keyStore) throw new NotFoundError("Key not found")
+    // console.log(">>>Key store: ", keyStore)
 
     if (req.headers[HEADER.REFRESHTOKEN]) {
         const refreshToken = req.headers[HEADER.REFRESHTOKEN];
@@ -120,6 +121,7 @@ const authentication = asyncHandler(async (req, res, next) => {
         if (userId !== decodeUser.userId) throw new AuthenticationError("Invalid User")
         req.keyStore = keyStore
         req.user = decodeUser
+        // console.log(">>>Decode user: ", decodeUser)
         return next()
     } catch (error) {
         throw error
@@ -138,6 +140,15 @@ const permission = (permission) => {
     }
 }
 
+const checkManagerPermission = async (req, res, next) => {
+    if (req.user.roles.includes('manager')) {
+        return next();
+    }
+    return res.status(403).json({
+        message: "Permission denied"
+    })
+}
+
 const verifyJWT = async (token, publicKey) => {
     const decoded = await JWT.verify(token, publicKey);
     return decoded
@@ -150,4 +161,5 @@ module.exports = {
     permission,
     authentication,
     verifyJWT,
+    checkManagerPermission,
 }

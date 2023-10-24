@@ -88,7 +88,7 @@ class AccessService {
       throw new BadRequestError('Create key token failed');
 
     return {
-      shop: newUser,
+      user: newUser,
       tokenPair,
     };
   };
@@ -140,12 +140,15 @@ class AccessService {
       throw new BadRequestError('Create key token failed');
 
     return {
-      shop: foundUser,
+      user: foundUser,
       tokenPair,
     };
   }
-  static signOut = async (keystore) => {
-    return await removeByIdToken(keystore._id);
+  static signOut = async (keyStore) => {
+    await removeByIdToken(keyStore._id);
+    return {
+      status: 200,
+    }
   }
 }
 
