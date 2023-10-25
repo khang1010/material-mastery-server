@@ -2,5 +2,5 @@ services:
   server:
     build: .
     ports:
-       - "80:80"
+      - "80:80"
     restart: always
