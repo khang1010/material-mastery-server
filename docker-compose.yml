@@ -1,6 +1,7 @@
+version: '3'
 services:
-  khangnt:
+  spring-boot-app:
     restart: always
     build: .
     ports:
-      - "80:80"
+      - 80:80
