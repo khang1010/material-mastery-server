@@ -35,4 +35,4 @@ COPY --chown=node:node . .
 
 RUN npm ci
 
-CMD ["npm", "start"]
+CMD ["npm", "start-server"]
