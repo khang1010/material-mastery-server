@@ -15,6 +15,18 @@ jobs:
       - name: Change mode
         run: chmod 400 "key.pem"
       - name: SSH
+        env:
+          PORT:${{secrets.PORT}}
+          NODE_ENV:${{secrets.NODE_ENV}}
+          DEV_APP_PORT:${{secrets.DEV_APP_PORT}}
+          DEV_DB_HOST:${{secrets.DEV_DB_HOST}}
+          DEV_DB_NAME:${{secrets.DEV_DB_NAME}}
+          DEV_DB_PASSWORD:${{secrets.DEV_DB_PASSWORD}}
+          DEV_DB_PORT:${{secrets.DEV_DB_PORT}}
+          PRO_APP_PORT:${{secrets.PRO_APP_PORT}}
+          PRO_DB_HOST:${{secrets.PRO_DB_HOST}}
+          PRO_DB_NAME:${{secrets.PRO_DB_NAME}}
+          PRO_DB_PORT:${{secrets.PRO_DB_PORT}}
         run: |
           ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-3-25-253-64.ap-southeast-2.compute.amazonaws.com "
           rm -rf material-mastery-server &&
