@@ -5,7 +5,7 @@ const dev = {
     port: process.env.DEV_APP_PORT || 8083,
     db: {
         host: process.env.DEV_DB_HOST || 'localhost',
-        name: process.env.DEV_DB_NAME || 'materialDev',
+        name: process.env.DEV_DB_NAME || 'material',
         port: process.env.DEV_DB_PORT || 27017,
         password: process.env.DEV_DB_PASSWORD,
     }
