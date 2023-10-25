@@ -32,7 +32,13 @@ jobs:
           rm -rf material-mastery-server &&
           git clone https://github.com/khang1010/material-mastery-server.git &&
           cd material-mastery-server && 
-          echo "${{secrets.PORT}}\n${{secrets.NODE_ENV}}\n${{secrets.DEV_APP_PORT}}\n${{secrets.DEV_DB_HOST}}\n${{secrets.DEV_DB_NAME}}\n${{secrets.DEV_DB_PASSWORD}}\n${{secrets.DEV_DB_PORT}}" > .env &&
+          echo "PORT=${{secrets.PORT}}\n
+NODE_ENV=${{secrets.NODE_ENV}}\n
+DEV_APP_PORT=${{secrets.DEV_APP_PORT}}\n
+DEV_DB_HOST=${{secrets.DEV_DB_HOST}}\n
+DEV_DB_NAME=${{secrets.DEV_DB_NAME}}\n
+DEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}\n
+DEV_DB_PORT=${{secrets.DEV_DB_PORT}}" > .env &&
           sudo docker-compose down &&
           sudo docker-compose up --build -d &&
           sudo docker image prune -f &&
