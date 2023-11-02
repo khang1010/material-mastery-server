@@ -22,7 +22,6 @@ class AccessService {
     user_attributes,
     status = 'inactive',
     roles = ['customer'],
-    userType = 'customer',
   }) => {
     //check user exists
     const holderShop = await user
@@ -42,6 +41,7 @@ class AccessService {
       roles,
       user_attributes
     };
+    const userType = roles[0];
     const newUser = await UserFactory.createUser(userType, payload);
     if (!newUser) throw new BadRequestError('Create user failed');
 

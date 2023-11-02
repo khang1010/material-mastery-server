@@ -131,7 +131,9 @@ const authentication = asyncHandler(async (req, res, next) => {
 
 const permission = (permission) => {
     return (req, res, next) => {
-        if (!req.objKey.permissions.includes(permission)) {
+        if (req.user.roles.includes("manager")) return next();
+        if (req.user.roles.includes("staff") && permission !== "manager") return next();
+        if (!req.user.roles.includes(permission)) {
             return res.status(403).json({
                 message: "Permission denied"
             })

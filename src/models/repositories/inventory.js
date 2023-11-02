@@ -11,6 +11,11 @@ const createInventory = async({ productId, stock, location = 'unknown'}) => {
     })
 }
 
+const findInventoryByProductId = async (productId) => {
+    return await inventoryModel.findOne({inventory_productId: new Types.ObjectId(productId)});
+}
+
 module.exports = {
     createInventory,
+    findInventoryByProductId,
 }

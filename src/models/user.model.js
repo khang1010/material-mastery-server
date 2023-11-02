@@ -38,7 +38,7 @@ var userSchema = new mongoose.Schema({
     },
     roles: {
         type: Array,
-        default: []
+        default: [],
     },
     user_attributes: {
         type: mongoose.Schema.Types.Mixed,
