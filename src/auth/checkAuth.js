@@ -4,7 +4,7 @@ const asyncHandler = require("../helpers/asyncHandler");
 const { findByKey } = require("../models/repositories/apiKey");
 const JWT = require('jsonwebtoken');
 const { findKeyToken } = require("../models/repositories/keyToken");
-const { AuthenticationError, NotFoundError } = require("../core/error-response");
+const { AuthenticationError, NotFoundError, BadRequestError } = require("../core/error-response");
 
 const HEADER = {
     API_KEY: 'x-api-key',
@@ -124,7 +124,7 @@ const authentication = asyncHandler(async (req, res, next) => {
         // console.log(">>>Decode user: ", decodeUser)
         return next()
     } catch (error) {
-        throw error
+        throw new BadRequestError("Invalid Token")
     }
 
 })
