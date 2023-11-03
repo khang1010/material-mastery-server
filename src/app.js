@@ -6,6 +6,7 @@ const instanceMongoDb = require('./dbs/init-mongodb');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDocument = require('./utils/swagger');
+const redisClient = require('./dbs/init-redis');
 require('dotenv').config();
 const app = express();
 
