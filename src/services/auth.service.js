@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 const redisClient = require('../dbs/init-redis');
 const { OAuth2Client } = require('google-auth-library');
 const { BadRequestError } = require('../core/error-response');
-const twilio = require('twilio');
+// const twilio = require('twilio');
 const GOOGLE_MAILER_CLIENT_ID = '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com'
 const GOOGLE_MAILER_CLIENT_SECRET = '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'
 const GOOGLE_MAILER_REFRESH_TOKEN = '1//04qma96qfSeZaCgYIARAAGAQSNwF-L9IrWChvCIDFoWG5ccE3Y165QvgnvFwnHJB56E3xVpP0shMWDB9GipFiiCEicT7tatlV3Jw'
@@ -17,15 +17,14 @@ myOAuth2Client.setCredentials({
     refresh_token: GOOGLE_MAILER_REFRESH_TOKEN
 })
 
-const twilioClient = twilio('', '')
-function formatPhoneNumber(phoneNumber) {
-    const cleaned = phoneNumber.replace(/\D/g, '');
-    if (cleaned.startsWith('0')) {
-      return `+84${cleaned.slice(1)}`;
-    }
+// function formatPhoneNumber(phoneNumber) {
+//     const cleaned = phoneNumber.replace(/\D/g, '');
+//     if (cleaned.startsWith('0')) {
+//       return `+84${cleaned.slice(1)}`;
+//     }
   
-    return cleaned;
-}
+//     return cleaned;
+// }
 class AuthService {
     static generateVerificationCode = () => {
         const codeLength = 6;
@@ -87,21 +86,21 @@ class AuthService {
         return foundEmail;
     }
 
-    static sendVerificationSMS = async (phone) => {
-        try {
-            const code = await AuthService.saveVerificationToken(phone);
-            await twilioClient.messages.create({
-                body: `Your verification code is: ${code}`,
-                from: formatPhoneNumber('0387411702'),
-                to: formatPhoneNumber(phone),
-            });
+    // static sendVerificationSMS = async (phone) => {
+    //     try {
+    //         const code = await AuthService.saveVerificationToken(phone);
+    //         await twilioClient.messages.create({
+    //             body: `Your verification code is: ${code}`,
+    //             from: formatPhoneNumber('0387411702'),
+    //             to: formatPhoneNumber(phone),
+    //         });
 
-            return phone;
-        } catch (error) {
-            console.log(`Error: ${error}`);
-            throw new BadRequestError("Error sending verification SMS");
-        }
-    }
+    //         return phone;
+    //     } catch (error) {
+    //         console.log(`Error: ${error}`);
+    //         throw new BadRequestError("Error sending verification SMS");
+    //     }
+    // }
 }
 
 module.exports = AuthService;
