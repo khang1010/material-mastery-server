@@ -7,6 +7,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDocument = require('./utils/swagger');
 const redisClient = require('./dbs/init-redis');
+const cors = require('cors');
 require('dotenv').config();
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(
     extended: true,
   })
 );
+app.use(cors());
 
 // init routes
 app.use('/', require('./routes/index'));
