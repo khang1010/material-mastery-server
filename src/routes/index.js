@@ -10,6 +10,8 @@ router.use('/v1/api/category', require('./category/index'));
 router.use('/v1/api/key', require('./apiKey/index'));
 router.use('/v1/api/user', require('./user/index'));
 router.use('/v1/api/product', require('./product/index'));
+router.use('/v1/api/cart', require('./cart/index'));
+router.use('/v1/api/comment', require('./comment/index'));
 router.use('/v1/api', require('./access/index'));
 
 module.exports = router;

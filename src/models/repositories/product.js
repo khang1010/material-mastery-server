@@ -1,5 +1,6 @@
 'use strict';
 
+const { getUnSelectData, getSelectData } = require("../../utils");
 const { product } = require("../product.model");
 const { createInventory } = require("./inventory");
 
@@ -34,10 +35,15 @@ const deleteProductById = async (productId) => {
     return await product.findByIdAndDelete(productId);
 }
 
+const getProductById = async (productId, select) => {
+    return await product.findById(productId).select(getUnSelectData(select)).lean();
+}
+
 module.exports = {
     findProductByName,
     createProduct,
     getAllProduct,
     updateProductById,
     deleteProductById,
+    getProductById,
 }
