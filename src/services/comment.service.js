@@ -1,6 +1,6 @@
 'use strict';
 
-const { createComment, getCommentByParentId } = require("../models/repositories/comment");
+const { createComment, getCommentByParentId, deleteComments } = require("../models/repositories/comment");
 
 class CommentService {
     static createComment = async (payload) => {
@@ -9,6 +9,10 @@ class CommentService {
 
     static getComment = async (payload) => {
         return await getCommentByParentId(payload);
+    }
+
+    static deleteComment = async (payload, userId) => {
+        return await deleteComments(payload, userId);
     }
 }
 

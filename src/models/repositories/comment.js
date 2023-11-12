@@ -3,6 +3,7 @@
 const { Types } = require("mongoose");
 const commentModel = require("../comment.model");
 const { NotFoundError, BadRequestError } = require("../../core/error-response");
+const { getProductById } = require("./product");
 
 const createComment = async ({productId, userId, content, parentId = null}) => {
     let right;
@@ -70,7 +71,40 @@ const getCommentByParentId = async ({
     return comments;
 }
 
+const deleteComments = async ({productId, commentId}, userId) => {
+    const foundProduct = await getProductById(productId, []);
+    if (!foundProduct) throw new NotFoundError("Product not found");
+    const foundComment = await commentModel.findById(commentId);
+    if (!foundComment) throw new NotFoundError("Comment not found");
+    if (foundComment.comment_userId != userId) throw new BadRequestError("You can't delete this comment");
+
+    const left = foundComment.comment_left;
+    const right = foundComment.comment_right;
+    // Tính width
+    const width = right - left + 1;
+    // Xóa tất cả comment và comment con
+    await commentModel.deleteMany({
+        comment_productId: new Types.ObjectId(productId),
+        comment_left: {$gte: left, $lte: right}
+    })
+    // Cập nhật right và left cho các comment còn lại
+    await commentModel.updateMany({
+        comment_productId: new Types.ObjectId(productId),
+        comment_right: {$gt: right}
+    }, {
+        $inc: {comment_right: -width}
+    })
+    await commentModel.updateMany({
+        comment_productId: new Types.ObjectId(productId),
+        comment_left: {$gt: right}
+    }, {
+        $inc: {comment_left: -width}
+    })
+    return true;
+}
+
 module.exports = {
     createComment,
     getCommentByParentId,
+    deleteComments
 }
