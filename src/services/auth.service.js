@@ -6,7 +6,7 @@ const { BadRequestError } = require('../core/error-response');
 // const twilio = require('twilio');
 const GOOGLE_MAILER_CLIENT_ID = '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com'
 const GOOGLE_MAILER_CLIENT_SECRET = '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'
-const GOOGLE_MAILER_REFRESH_TOKEN = '1//04qma96qfSeZaCgYIARAAGAQSNwF-L9IrWChvCIDFoWG5ccE3Y165QvgnvFwnHJB56E3xVpP0shMWDB9GipFiiCEicT7tatlV3Jw'
+const GOOGLE_MAILER_REFRESH_TOKEN = '1//04ajkejTyLNtnCgYIARAAGAQSNwF-L9IruH7Ha6MAS4mYtsisAVR2BYIUCn0bGhNnlVO43UUIbxNi1vLmg9yEh-gHa1NUw51rwsQ'
 const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com'
 
 const myOAuth2Client = new OAuth2Client(
