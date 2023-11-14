@@ -1,6 +1,6 @@
 'use strict';
 
-const { BadRequestError } = require("../../core/error-response");
+const { BadRequestError, NotFoundError } = require("../../core/error-response");
 const cartModel = require("../cart.model");
 const { getProductById } = require("./product");
 const { Types } = require("mongoose");
@@ -51,6 +51,7 @@ const deleteProductInCart = async ({userId, product}) => {
         'cart_products.productId': product.productId,
         cart_state: 'active'
     })
+    if (!foundCart) throw new NotFoundError('Product not found in cart');
     const foundProduct = foundCart.cart_products.find(p => p.productId === product.productId)
     const query = {
         cart_userId: userId,
