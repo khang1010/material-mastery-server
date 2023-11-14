@@ -46,6 +46,12 @@ const updateProductQuantityInCart = async ({ userId, product }) => {
 }
 
 const deleteProductInCart = async ({userId, product}) => {
+    const foundCart = await cartModel.findOne({
+        cart_userId: userId,
+        'cart_products.productId': product.productId,
+        cart_state: 'active'
+    })
+    const foundProduct = foundCart.cart_products.find(p => p.productId === product.productId)
     const query = {
         cart_userId: userId,
         cart_state: 'active'
@@ -56,7 +62,7 @@ const deleteProductInCart = async ({userId, product}) => {
             }
         },
         $inc: {
-            cart_count_products: -product.quantity
+            cart_count_products: -foundProduct.product_quantity
         }
     }, options = { upsert: true, new: true };
 
