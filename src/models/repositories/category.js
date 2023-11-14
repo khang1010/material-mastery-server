@@ -1,5 +1,6 @@
 'use strict';
 
+const { getSelectData } = require("../../utils");
 const categoryModel = require("../category.model");
 
 const createCategory = async ({name, description = '', parent = null}) => {
@@ -22,9 +23,25 @@ const findByName = async (name) => {
     return await categoryModel.findOne({category_name: name}).lean();
 }
 
+const getCategoryById = async (id, select) => {
+    return await categoryModel.findById(id)
+    .select(getSelectData(select))
+    .lean();
+}
+
+const getAllCategoriesByFilter = async ({limit = 50, page = 1, filter, select}) => {
+    return await categoryModel.find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .select(getSelectData(select))
+    .lean();
+}
+
 module.exports = {
     createCategory,
     getAllCategory,
     deleteCategory,
     findByName,
+    getCategoryById,
+    getAllCategoriesByFilter,
 }

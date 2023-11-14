@@ -39,6 +39,15 @@ const getProductById = async (productId, select) => {
     return await product.findById(productId).select(getUnSelectData(select)).lean();
 }
 
+const getAllProductsByUser = async ({limit = 50, page = 1, sorted = 'ctime', filter, unSelect}) => {
+    return await product.find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort(sorted === 'ctime' ? {_id: -1} : {_id: 1})
+    .select(getUnSelectData(unSelect))
+    .lean()
+}
+
 module.exports = {
     findProductByName,
     createProduct,
@@ -46,4 +55,5 @@ module.exports = {
     updateProductById,
     deleteProductById,
     getProductById,
+    getAllProductsByUser,
 }

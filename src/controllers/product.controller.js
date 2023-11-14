@@ -31,6 +31,13 @@ class ProductController {
             metadata: await ProductService.updateProductById(req.params.id, req.body),
         }).send(res);
     }
+
+    static getProductById = async (req, res, next) => {
+        new OkResponse({
+            message: "Get product successfully",
+            metadata: await ProductService.getProductById(req.params.id),
+        }).send(res);
+    }
 }
 
 module.exports = ProductController;

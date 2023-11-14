@@ -5,6 +5,7 @@ const { authentication, permission } = require('../../auth/checkAuth');
 const router = express.Router();
 
 router.get('/', asyncHandler(ProductController.getAll));
+router.get('/:id', asyncHandler(ProductController.getProductById));
 
 router.use(authentication);
 router.use(permission('staff'));
