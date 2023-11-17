@@ -1,8 +1,8 @@
 'use strict';
 
 const { BadRequestError, NotFoundError } = require("../core/error-response");
-const { getAllCategoriesByFilter } = require("../models/repositories/category");
-const { findProductByName, createProduct, getAllProduct, deleteProductById, updateProductById, getProductById } = require("../models/repositories/product");
+const { getAllCategoriesByFilter, getCategoryById } = require("../models/repositories/category");
+const { findProductByName, createProduct, getAllProduct, deleteProductById, updateProductById, getProductById, getAllProductsByUser } = require("../models/repositories/product");
 const { removeUndefinedObject, updateNestedObject } = require("../utils");
 
 class ProductService {
@@ -39,6 +39,14 @@ class ProductService {
             ...foundProduct,
             product_categories: category
         }
+    }
+
+    static async getProductByCategoryId(categoryId) {
+        const foundCategory = await getCategoryById(categoryId, ["category_name"]);
+        if (!foundCategory) throw new NotFoundError("Category not found");
+        return await getAllProductsByUser({filter: {
+            product_categories: {$in: [categoryId]}
+        }, unSelect: ["product_categories", "__v"]});
     }
 }
 

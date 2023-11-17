@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.get('/', asyncHandler(ProductController.getAll));
 router.get('/:id', asyncHandler(ProductController.getProductById));
+router.get('/category/:id', asyncHandler(ProductController.getProductByCategoryId));
 
 router.use(authentication);
 router.use(permission('staff'));

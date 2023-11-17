@@ -38,6 +38,12 @@ class ProductController {
             metadata: await ProductService.getProductById(req.params.id),
         }).send(res);
     }
+    static getProductByCategoryId = async (req, res, next) => {
+        new OkResponse({
+            message: "Get product by category successfully",
+            metadata: await ProductService.getProductByCategoryId(req.params.id),
+        }).send(res);
+    }
 }
 
 module.exports = ProductController;

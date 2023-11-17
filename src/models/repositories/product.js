@@ -39,7 +39,7 @@ const getProductById = async (productId, select) => {
     return await product.findById(productId).select(getUnSelectData(select)).lean();
 }
 
-const getAllProductsByUser = async ({limit = 50, page = 1, sorted = 'ctime', filter, unSelect}) => {
+const getAllProductsByUser = async ({limit = 50, page = 1, sorted = 'ctime', filter, unSelect = []}) => {
     return await product.find(filter)
     .skip((page - 1) * limit)
     .limit(limit)
