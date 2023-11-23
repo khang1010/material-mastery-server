@@ -1,6 +1,6 @@
 'use strict';
 
-const { BadRequestError } = require('../core/error-response');
+const { BadRequestError, NotFoundError } = require('../core/error-response');
 const { updateUserById, findUserById } = require('../models/repositories/user');
 const { user, customer, staff, manager } = require('../models/user.model');
 const { removeUndefinedObject, updateNestedObject } = require('../utils');
@@ -29,6 +29,32 @@ class UserFactory {
     const classRef = UserFactory.userRegistry[type];
     if (!classRef) throw new BadRequestError(`Invalid user type: ${type}`);
     return new classRef(payload).updateUser(user_id);
+  }
+
+  static async findUserById(user_id) {
+    const foundUser = await findUserById(user_id);
+    if (!foundUser) throw new NotFoundError('User not found');
+    return foundUser;
+  }
+
+  static async getNumberOfUsers() {
+    const count = await user.countDocuments();
+    return count;
+  }
+
+  static async getNumberOfCustomers() {
+    const count = await customer.countDocuments();
+    return count;
+  }
+
+  static async getNumberOfStaffs() {
+    const count = await staff.countDocuments();
+    return count;
+  }
+
+  static async getNumberOfManagers() {
+    const count = await manager.countDocuments();
+    return count;
   }
 }
 
