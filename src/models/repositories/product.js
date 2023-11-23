@@ -1,6 +1,6 @@
 'use strict';
 
-const { getUnSelectData, getSelectData } = require("../../utils");
+const { getUnSelectData, getSelectData, getSortAscending, getSortDescending } = require("../../utils");
 const { product } = require("../product.model");
 const { createInventory } = require("./inventory");
 
@@ -39,11 +39,12 @@ const getProductById = async (productId, select) => {
     return await product.findById(productId).select(getUnSelectData(select)).lean();
 }
 
-const getAllProductsByUser = async ({limit = 50, page = 1, sorted = 'ctime', filter, unSelect = []}) => {
+const getAllProductsByUser = async ({limit = 50, page = 1, sorted = ["_id"], filter = {}, unSelect = [], isAscending = true}) => {
+    // isAscending === 'true' ? console.log(">>>sort: ", getSortAscending(sorted)) : console.log(">>>sort: ", getSortDescending(sorted));
     return await product.find(filter)
     .skip((page - 1) * limit)
     .limit(limit)
-    .sort(sorted === 'ctime' ? {_id: -1} : {_id: 1})
+    .sort(isAscending === 'true' ? getSortAscending(sorted) : getSortDescending(sorted))
     .select(getUnSelectData(unSelect))
     .lean()
 }

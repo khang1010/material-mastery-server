@@ -14,7 +14,7 @@ class ProductController {
     static getAll = async (req, res, next) => {
         new OkResponse({
             message: "Get all products successfully",
-            metadata: await ProductService.getAllProducts(),
+            metadata: await ProductService.getAllProducts(req.query),
         }).send(res);
     }
 
@@ -41,7 +41,7 @@ class ProductController {
     static getProductByCategoryId = async (req, res, next) => {
         new OkResponse({
             message: "Get product by category successfully",
-            metadata: await ProductService.getProductByCategoryId(req.params.id),
+            metadata: await ProductService.getProductByCategoryId(req.params.id, req.query),
         }).send(res);
     }
 }

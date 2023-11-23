@@ -14,6 +14,18 @@ const getUnSelectData = (select = []) => {
     }))
 }
 
+const getSortAscending = (sort = []) => {
+    return Object.fromEntries(sort.map((item) => {
+        return [item, 1];
+    }))
+}
+
+const getSortDescending = (sort = []) => {
+    return Object.fromEntries(sort.map((item) => {
+        return [item, -1];
+    }))
+}
+
 const removeUndefinedObject = (obj) => {
     Object.keys(obj).forEach((key) => {
         if (obj[key] === undefined || obj[key] === null) delete obj[key];
@@ -47,4 +59,6 @@ module.exports = {
     removeUndefinedObject,
     updateNestedObject,
     convertToObjectId,
+    getSortAscending,
+    getSortDescending,
 }

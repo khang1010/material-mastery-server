@@ -26,8 +26,9 @@ class ProductService {
         return newProduct;
     }
 
-    static async getAllProducts() {
-        return await getAllProduct();
+    static async getAllProducts(payload) {
+        // console.log(">>>payload: ", payload);
+        return await getAllProductsByUser(payload);
     }
 
     static async deleteProductById(id) {
@@ -70,10 +71,10 @@ class ProductService {
         }
     }
 
-    static async getProductByCategoryId(categoryId) {
+    static async getProductByCategoryId(categoryId, payload) {
         const foundCategory = await getCategoryById(categoryId, ["category_name"]);
         if (!foundCategory) throw new NotFoundError("Category not found");
-        return await getAllProductsByUser({filter: {
+        return await getAllProductsByUser({...payload, filter: {
             product_categories: {$in: [categoryId]}
         }, unSelect: ["product_categories", "__v"]});
     }
