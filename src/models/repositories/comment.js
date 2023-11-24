@@ -4,8 +4,10 @@ const { Types } = require("mongoose");
 const commentModel = require("../comment.model");
 const { NotFoundError, BadRequestError } = require("../../core/error-response");
 const { getProductById } = require("./product");
+const { updateProductRating } = require("../../services/product.service");
+const { findUserById } = require("./user");
 
-const createComment = async ({productId, userId, content, parentId = null}) => {
+const createComment = async ({productId, userId, content, parentId = null, rating = 1}) => {
     let right;
     if (parentId) {
         const foundParent = await commentModel.findById(parentId);
@@ -32,15 +34,25 @@ const createComment = async ({productId, userId, content, parentId = null}) => {
             right = 1
         }
     }
+    const foundUser = await findUserById(userId);
 
-    return await commentModel.create({
+    const newComment = await commentModel.create({
         comment_productId: productId,
         comment_userId: userId,
         comment_content: content,
         comment_parentId: parentId,
         comment_left: right,
-        comment_right: right + 1
+        comment_right: right + 1,
+        comment_userName: foundUser.display_name,
+        comment_rating: rating,
     });
+    if (!newComment) throw new BadRequestError("Comment not created");
+    try {
+        await updateProductRating(productId);
+    } catch (error) {
+        throw new BadRequestError(error);
+    }
+    return newComment;
 }
 
 const getCommentByParentId = async ({
@@ -100,6 +112,11 @@ const deleteComments = async ({productId, commentId}, userId) => {
     }, {
         $inc: {comment_left: -width}
     })
+    try {
+        await updateProductRating(productId);
+    } catch (error) {
+        throw new BadRequestError(error);
+    }
     return true;
 }
 

@@ -1,5 +1,8 @@
 'use strict';
+const { default: mongoose, Types } = require("mongoose");
 const { BadRequestError, NotFoundError } = require("../core/error-response");
+const commentModel = require("../models/comment.model");
+const productModel = require("../models/product.model");
 const { getAllCategoriesByFilter, getCategoryById } = require("../models/repositories/category");
 const { updateInventoryByProductId } = require("../models/repositories/inventory");
 const { createOrUpdateNotificationByType, checkProductExists, deleteProductInStaffNotification } = require("../models/repositories/notification");
@@ -77,6 +80,34 @@ class ProductService {
         return await getAllProductsByUser({...payload, filter: {
             product_categories: {$in: [categoryId]}
         }, unSelect: ["product_categories", "__v"]});
+    }
+
+    static async updateProductRating(productId) {
+        try {
+            const pipeline = [
+                {
+                  $match: { comment_productId: new Types.ObjectId(productId), comment_parentId: null }
+                },
+                {
+                  $group: {
+                    _id: null,
+                    totalRating: { $sum: '$comment_rating' },
+                    commentCount: { $sum: 1 }
+                  }
+                }
+            ];
+            const result = await commentModel.aggregate(pipeline);
+            if (result.length > 0) {
+                const { totalRating, commentCount } = result[0];
+                const product = await updateProductById(productId, {
+                  product_ratingAverage: commentCount > 0 ? totalRating / commentCount : 0
+                });
+                return product;
+            }
+            return null;
+          } catch (error) {
+            throw new BadRequestError(error);
+          }
     }
 }
 
