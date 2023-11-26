@@ -13,6 +13,7 @@ router.use('/v1/api/user', require('./user/index'));
 router.use('/v1/api/cart', require('./cart/index'));
 router.use('/v1/api/comment', require('./comment/index'));
 router.use('/v1/api/notification', require('./notification/index'));
+router.use('/v1/api/favorite', require('./favorite/index'));
 router.use('/v1/api', require('./access/index'));
 
 module.exports = router;
