@@ -113,7 +113,7 @@ const authentication = asyncHandler(async (req, res, next) => {
     }
 
     const accessToken = req.headers[HEADER.AUTHORIZATION]
-    console.log("AccessToken: ", accessToken)
+    // console.log("AccessToken: ", accessToken)
     if (!accessToken) throw new AuthenticationError("Invalid Token")
 
     try {
@@ -124,7 +124,7 @@ const authentication = asyncHandler(async (req, res, next) => {
         // console.log(">>>Decode user: ", decodeUser)
         return next()
     } catch (error) {
-        throw new BadRequestError("Invalid Token")
+        throw new BadRequestError(error)
     }
 
 })

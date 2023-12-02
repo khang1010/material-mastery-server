@@ -6,7 +6,7 @@ const productModel = require("../models/product.model");
 const { getAllCategoriesByFilter, getCategoryById } = require("../models/repositories/category");
 const { updateInventoryByProductId } = require("../models/repositories/inventory");
 const { createOrUpdateNotificationByType, checkProductExists, deleteProductInStaffNotification } = require("../models/repositories/notification");
-const { findProductByName, createProduct, getAllProduct, deleteProductById, updateProductById, getProductById, getAllProductsByUser } = require("../models/repositories/product");
+const { findProductByName, createProduct, getAllProduct, deleteProductById, updateProductById, getProductById, getAllProductsByUser, publishProduct, unPublishProduct } = require("../models/repositories/product");
 const { removeUndefinedObject, updateNestedObject } = require("../utils");
 const content = {
     "STAFF-001": "There is a risk of product shortage in quantity (<=5)",
@@ -31,7 +31,7 @@ class ProductService {
 
     static async getAllProducts(payload) {
         // console.log(">>>payload: ", payload);
-        return await getAllProductsByUser(payload);
+        return await getAllProductsByUser({...payload, filter: {isDraft: false}});
     }
 
     static async deleteProductById(id) {
@@ -78,7 +78,8 @@ class ProductService {
         const foundCategory = await getCategoryById(categoryId, ["category_name"]);
         if (!foundCategory) throw new NotFoundError("Category not found");
         return await getAllProductsByUser({...payload, filter: {
-            product_categories: {$in: [categoryId]}
+            product_categories: {$in: [categoryId]},
+            isDraft: false
         }, unSelect: ["product_categories", "__v"]});
     }
 
@@ -108,6 +109,14 @@ class ProductService {
           } catch (error) {
             throw new BadRequestError(error);
           }
+    }
+
+    static async publishProduct(payload) {
+        return await publishProduct(payload);
+    }
+
+    static async unPublishProduct(payload) {
+        return await unPublishProduct(payload);
     }
 }
 

@@ -1,14 +1,16 @@
 'use strict';
 
+const { Types } = require("mongoose");
 const { getUnSelectData, getSelectData, getSortAscending, getSortDescending } = require("../../utils");
 const { product } = require("../product.model");
 const { createInventory } = require("./inventory");
+const { NotFoundError } = require("../../core/error-response");
 
 const findProductByName = async (product_name) => {
     return await product.findOne({product_name}).lean();
 }
 
-const createProduct = async ({name, thumb = "", description = "", price, quantity, brand = "empty", unit, categories}) => {
+const createProduct = async ({name, thumb = "", description = "", price, quantity, brand = "empty", unit, categories, isDraft = false}) => {
     const newProduct =  await product.create({
         product_name: name,
         product_thumb: thumb,
@@ -18,6 +20,7 @@ const createProduct = async ({name, thumb = "", description = "", price, quantit
         product_brand: brand,
         product_unit: unit,
         product_categories: categories,
+        isDraft: isDraft
     });
     const newInventory = await createInventory({productId: newProduct._id, stock: newProduct.product_quantity});
     return newProduct;
@@ -49,6 +52,24 @@ const getAllProductsByUser = async ({limit = 50, page = 1, sorted = ["_id"], fil
     .lean()
 }
 
+const publishProduct = async ({id}) => {
+    const foundProduct = await product.findById(id)
+    if (!foundProduct) throw new NotFoundError('Product not found')
+    foundProduct.isDraft = false
+
+    const {modifiedCount} = await foundProduct.updateOne(foundProduct)
+    return modifiedCount
+}
+
+const unPublishProduct = async ({id}) => {
+    const foundProduct = await product.findById(id)
+    if (!foundProduct) throw new NotFoundError('Product not found')
+    foundProduct.isDraft = true
+
+    const {modifiedCount} = await foundProduct.updateOne(foundProduct)
+    return modifiedCount
+}
+
 module.exports = {
     findProductByName,
     createProduct,
@@ -57,4 +78,6 @@ module.exports = {
     deleteProductById,
     getProductById,
     getAllProductsByUser,
+    publishProduct,
+    unPublishProduct,
 }

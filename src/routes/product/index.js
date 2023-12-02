@@ -10,6 +10,8 @@ router.get('/category/:id', asyncHandler(ProductController.getProductByCategoryI
 
 router.use(authentication);
 router.use(permission('staff'));
+router.get('/publish/:id', asyncHandler(ProductController.publishProduct));
+router.get('/unpublish/:id', asyncHandler(ProductController.unPublishProduct));
 router.post('/', asyncHandler(ProductController.create));
 router.patch('/:id', asyncHandler(ProductController.update));
 router.delete('/:id', asyncHandler(ProductController.deleteById));
