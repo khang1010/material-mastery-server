@@ -5,6 +5,7 @@ const DiscountController = require('../../controllers/discount.controller');
 
 const router = express.Router();
 
+router.get('/', asyncHandler(DiscountController.getDiscountsOfProduct));
 router.get('/products', asyncHandler(DiscountController.getProductsApplyDiscount));
 router.post('/amount', asyncHandler(DiscountController.getDiscountAmount));
 

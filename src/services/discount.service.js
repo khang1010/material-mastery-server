@@ -2,7 +2,7 @@
 const { BadRequestError, NotFoundError } = require("../core/error-response");
 const discountModel = require("../models/discount.model");
 const { findDiscountByCode, getAllDiscountCodesUnselect, updateDiscountCode, deleteDiscountCode, cancelDiscountCode, findDiscountById } = require("../models/repositories/discount");
-const { getAllProductsByUser } = require("../models/repositories/product");
+const { getAllProductsByUser, getProductById } = require("../models/repositories/product");
 const { convertToObjectId, removeUndefinedObject, updateNestedObject } = require("../utils");
 
 class DiscountService {
@@ -85,6 +85,17 @@ class DiscountService {
             discount: amount,
             finalCost: totalCost - amount,
         }
+    }
+
+    static async getDiscountsOfProduct({productId, limit = 50, page = 1, sorted = ["_id"], isAscending = true}) {
+        const foundProduct = await getProductById(productId, []);
+        if (!foundProduct) throw new NotFoundError('Product not found');
+        return await getAllDiscountCodesUnselect({filter: {
+            $or: [
+                {discount_apply_to: 'all'},
+                {discount_products: {$in: [productId]}}
+            ]
+        }, limit, page, sorted, isAscending});
     }
 }
 

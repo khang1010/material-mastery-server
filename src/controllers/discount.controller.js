@@ -54,6 +54,15 @@ class DiscountController {
             })
         }).send(res);
     }
+
+    static getDiscountsOfProduct = async (req, res, next) => {
+        new OkResponse({
+            message: "get discounts of product successfully",
+            metadata: await DiscountService.getDiscountsOfProduct({
+                ...req.query,
+            })
+        }).send(res);
+    }
 }
 
 module.exports = DiscountController
