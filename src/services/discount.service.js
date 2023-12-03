@@ -66,7 +66,7 @@ class DiscountService {
     }
 
     static async getDiscountAmount({discountId, userId = "", products}) {
-        const foundDiscount = await findDiscountById(convertToObjectId(discountId));
+        const foundDiscount = await findDiscountById(discountId);
         if (!foundDiscount) throw new NotFoundError('Discount code not found');
 
         if (!foundDiscount.discount_is_active) throw new BadRequestError('Discount code is not active');
@@ -75,7 +75,7 @@ class DiscountService {
 
         let totalCost = products.reduce((acc, product) => acc + product.product_price * product.product_quantity, 0);
         if (foundDiscount.discount_min_order_value > totalCost) throw new BadRequestError('Total cost must be greater than or equal to minimum order value');
-        let amount = foundDiscount.discount_type === 'fixed_amount' ? foundDiscount.discount_value : totalCost/100 * foundDiscount.discount_value;
+        let amount = foundDiscount.discount_type === 'fixed_amount' ? foundDiscount.discount_value : (totalCost/100 * foundDiscount.discount_value);
 
         if (foundDiscount.discount_max_uses_per_user > 0) {
             //...

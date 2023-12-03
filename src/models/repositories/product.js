@@ -70,6 +70,18 @@ const unPublishProduct = async ({id}) => {
     return modifiedCount
 }
 
+const checkProductByServer = async (products) => {
+    return await Promise.all(products.map(async (product) => {
+        const foundProduct = await getProductById(product.productId, ["createdAt", "updatedAt", "__v", "product_slug", "_id"])
+        if (!foundProduct) throw new NotFoundError('Product not found')
+        return {
+            product_price: foundProduct.product_price,
+            product_quantity: product.quantity,
+            productId: product.productId
+        }
+    }))
+}
+
 module.exports = {
     findProductByName,
     createProduct,
@@ -80,4 +92,5 @@ module.exports = {
     getAllProductsByUser,
     publishProduct,
     unPublishProduct,
+    checkProductByServer,
 }
