@@ -1,6 +1,7 @@
 'use strict';
 
 const { NotFoundError } = require("../core/error-response");
+const cartModel = require("../models/cart.model");
 const { createUserCart, getUserCart, deleteProductInCart, updateProductQuantityInCart } = require("../models/repositories/cart");
 const { getProductById } = require("../models/repositories/product");
 
@@ -12,6 +13,14 @@ class CartService {
         }
 
         if (!userCart.cart_count_products) {
+            return await createUserCart({ userId, product });
+        }
+        const isProductExists = await cartModel.exists({
+            cart_userId: userId,
+            'cart_products.productId': product.productId,
+            cart_state: 'active'
+        });
+        if (!isProductExists) {
             return await createUserCart({ userId, product });
         }
 
