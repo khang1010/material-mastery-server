@@ -25,7 +25,7 @@ class AccessService {
   }) => {
     //check user exists
     const holderShop = await user
-      .findOne({ $or: [{ email }, { username }, { phone }] })
+      .findOne({ $or: [{ username }, { phone }] })
       .lean();
     if (holderShop) throw new ConflictError('User already exists');
     //Hash password

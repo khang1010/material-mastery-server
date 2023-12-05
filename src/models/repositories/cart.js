@@ -2,6 +2,7 @@
 
 const { BadRequestError, NotFoundError } = require("../../core/error-response");
 const cartModel = require("../cart.model");
+const { findInventoryByProductId } = require("./inventory");
 const { getProductById } = require("./product");
 const { Types } = require("mongoose");
 
@@ -42,7 +43,33 @@ const updateProductQuantityInCart = async ({ userId, product }) => {
 
         }
     }, options = { upsert: true, new: true };
+    const inventory = await findInventoryByProductId(productId);
+    const productInCart = await findProductInCart(userId, productId); 
+
+    if (inventory.inventory_stock < quantity + productInCart.product_quantity) {
+        throw new BadRequestError('Insufficient product inventory');
+    }
     return await cartModel.findOneAndUpdate(query, updateSet, options);
+}
+
+const findProductInCart = async (userId, productId) => {
+    // Assume you have a cartModel or a collection to store the cart data
+    const cart = await cartModel.findOne({
+        cart_userId: userId,
+        'cart_products.productId': productId,
+        cart_state: 'active'
+    });
+
+    if (!cart) {
+        throw new BadRequestError('Cart not found');
+    }
+
+    const productInCart = cart.cart_products.find(product => product.productId == productId);
+    if (!productInCart) {
+        throw new BadRequestError('Product not found in cart');
+    }
+
+    return productInCart;
 }
 
 const deleteProductInCart = async ({userId, product}) => {
@@ -95,5 +122,5 @@ module.exports = {
     updateProductQuantityInCart,
     deleteProductInCart,
     getUserCart,
-    // addProductToCart,
+    findProductInCart,
 }

@@ -3,10 +3,11 @@ const nodemailer = require('nodemailer');
 const redisClient = require('../dbs/init-redis');
 const { OAuth2Client } = require('google-auth-library');
 const { BadRequestError } = require('../core/error-response');
+const { user } = require('../models/user.model');
 // const twilio = require('twilio');
 const GOOGLE_MAILER_CLIENT_ID = '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com'
 const GOOGLE_MAILER_CLIENT_SECRET = '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'
-const GOOGLE_MAILER_REFRESH_TOKEN = '1//04wrAa4AEe-vnCgYIARAAGAQSNwF-L9IrMItZKcZQYcVEgDWA7lOWdaK58ucRR7XBLjadAvxKUA9M5vhVAWvPyeZX-pletMeHyeI'
+const GOOGLE_MAILER_REFRESH_TOKEN = '1//04cFVbIBxZ7WMCgYIARAAGAQSNwF-L9Ir6ARxlo3qAWIOHe6R5unQTRPlO8XQogTf770CTYZsr2tEgC1XCwN6DhA66_iTQmBXow8'
 const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com'
 
 const myOAuth2Client = new OAuth2Client(
@@ -34,8 +35,9 @@ class AuthService {
         return verificationCode.toString();
     }
     static sendVerificationEmail = async (email) => {
+        const foundUser = await user.findOne({ email }).lean();
+        if (foundUser) throw new BadRequestError('Email already exists');
         try {
-
             const myAccessTokenObject = await myOAuth2Client.getAccessToken()
             const myAccessToken = myAccessTokenObject?.token
             const transport = nodemailer.createTransport({

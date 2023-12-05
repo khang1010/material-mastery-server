@@ -1,12 +1,17 @@
 'use strict';
 
-const { NotFoundError } = require("../core/error-response");
+const { NotFoundError, BadRequestError } = require("../core/error-response");
 const cartModel = require("../models/cart.model");
+const inventoryModel = require("../models/inventory.model");
 const { createUserCart, getUserCart, deleteProductInCart, updateProductQuantityInCart } = require("../models/repositories/cart");
+const { findInventoryByProductId } = require("../models/repositories/inventory");
 const { getProductById } = require("../models/repositories/product");
 
 class CartService {
     static async addToCart({ userId, product }) {
+        const inventory = await findInventoryByProductId(product.productId);
+        if (!inventory) throw new BadRequestError("Product not found");
+        if (inventory.inventory_stock < product.quantity) throw new BadRequestError("Insufficient product inventory")
         const userCart = await getUserCart(userId);
         if (!userCart) {
             return await createUserCart({ userId, product });
