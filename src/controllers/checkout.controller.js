@@ -10,6 +10,12 @@ class CheckoutController {
             metadata: await CheckoutService.checkoutReview({...req.body, userId: req.user.userId})
         }).send(res);
     }
+    static orderByUser = async (req, res, next) => {
+        new OkResponse({
+            message: "Order successfully",
+            metadata: await CheckoutService.orderByUser({...req.body, userId: req.user.userId})
+        }).send(res);
+    }
 }
 
 module.exports = CheckoutController;

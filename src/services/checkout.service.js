@@ -5,6 +5,10 @@ const { NotFoundError, BadRequestError } = require("../core/error-response");
 const { getUserCart } = require("../models/repositories/cart");
 const { checkProductByServer } = require("../models/repositories/product");
 const { getDiscountAmount } = require("./discount.service");
+const RedisService = require("./redis.service");
+const orderModel = require("../models/order.model");
+const { convertToObjectId } = require("../utils");
+const { findUserById } = require("../models/repositories/user");
 
 /*
 {
@@ -76,6 +80,45 @@ class CheckoutService {
             checkout_items,
             checkoutOrder
         }
+    }
+
+    static orderByUser = async ({
+        orders,
+        userId,
+        order_address = {},
+        order_payment = {},
+        order_note = '',
+    }) => {
+        const foundCart = await getUserCart(userId);
+        if (!foundCart) throw new NotFoundError('Not found cart');
+        const foundUser = await findUserById(userId);
+        if (!foundUser) throw new NotFoundError('Not found user');
+        const {checkout_items, checkoutOrder} = await this.checkoutReview({userId, orders});
+
+        const products = checkout_items.flatMap(item => item.item_products);
+        // console.log(">>>products: ", products);
+        const acquireProducts = [];
+        for (let i = 0; i < products.length; i++) {
+            const {productId, product_quantity} = products[i];
+            const keyLock = await RedisService.acquireLock(productId, product_quantity, foundCart._id);
+            acquireProducts.push(keyLock ? true : false);
+            if (keyLock) {
+                await RedisService.releaseLock(keyLock);
+            }
+        }
+
+        if (acquireProducts.includes(false)) throw new BadRequestError('Something wrong with products!!!');
+        const newOrder = await orderModel.create({
+            order_userId: convertToObjectId(userId),
+            order_note,
+            order_address,
+            order_payment,
+            order_phone: foundUser.phone,
+            order_checkout: checkoutOrder,
+            order_products: checkout_items
+        })
+
+        return newOrder;
     }
 }
 

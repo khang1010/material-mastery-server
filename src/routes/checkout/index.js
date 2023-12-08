@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.use(authentication)
 router.post('/review', asyncHandler(CheckoutController.checkoutReview));
+router.post('/order', asyncHandler(CheckoutController.orderByUser));
 
 module.exports = router;
