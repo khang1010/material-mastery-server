@@ -9,6 +9,7 @@ const RedisService = require("./redis.service");
 const orderModel = require("../models/order.model");
 const { convertToObjectId } = require("../utils");
 const { findUserById } = require("../models/repositories/user");
+const { calculateRevenueByDay, calculateRevenueByMonth, calculateRevenueByWeek, calculateRevenueByQuarter, calculateRevenueByYear } = require("../models/repositories/order");
 
 /*
 {
@@ -119,6 +120,25 @@ class CheckoutService {
         })
 
         return newOrder;
+    }
+
+    static calculateRevenue = async (type) => {
+        switch (type) {
+            case 'day':
+                return await calculateRevenueByDay();
+                break;
+            case 'week':
+                return await calculateRevenueByWeek();
+                break;
+            case 'month':
+                return await calculateRevenueByMonth();
+                break;
+            case 'quarter':
+                return await calculateRevenueByQuarter();
+                break;
+            case 'year':
+                return await calculateRevenueByYear();
+        }
     }
 }
 

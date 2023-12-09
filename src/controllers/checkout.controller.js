@@ -16,6 +16,12 @@ class CheckoutController {
             metadata: await CheckoutService.orderByUser({...req.body, userId: req.user.userId})
         }).send(res);
     }
+    static calculateRevenue = async (req, res, next) => {
+        new OkResponse({
+            message: "Calculate revenue successfully",
+            metadata: await CheckoutService.calculateRevenue(req.query.type)
+        }).send(res);
+    }
 }
 
 module.exports = CheckoutController;
