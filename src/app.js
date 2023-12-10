@@ -9,6 +9,7 @@ const swaggerDocument = require('./utils/swagger');
 const redisClient = require('./dbs/init-redis');
 const cors = require('cors');
 require('dotenv').config();
+require('./helpers/billCleanup');
 const app = express();
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));

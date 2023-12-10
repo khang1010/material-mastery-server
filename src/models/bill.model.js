@@ -27,27 +27,34 @@ var billSchema = new mongoose.Schema({
         default: 0
     },
     supplier: {
-        type: String,
-        default: '',
+        type: Object,
+        default: {},
     },
     product_list: {
         type: Array,
         require: true,
     },
-    total_cost: {
-        type: Number,
+    bill_status: {
+        type: String,
         require: true,
-        default: 0
+        enum: ['pending', 'confirmed', 'deleted'],
+        default: 'pending',
     },
-    discount: {
-        type: Number,
-        require: true,
-        default: 0
+    bill_checkout: {
+        type: Object,
+        default: {}
     },
-    final_cost: {
-        type: Number,
-        require: true,
-        default: 0
+    bill_payment: {
+        type: Object,
+        default: {}
+    },
+    bill_address: {
+        type: Object,
+        default: {}
+    },
+    bill_image: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true,

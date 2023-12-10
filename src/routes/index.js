@@ -17,6 +17,7 @@ router.use('/v1/api/favorite', require('./favorite/index'));
 router.use('/v1/api/discount', require('./discount/index'));
 router.use('/v1/api/checkout', require('./checkout/index'));
 router.use('/v1/api/statistic', require('./statistic/index'));
+router.use('/v1/api/bill', require('./bill/index'));
 router.use('/v1/api', require('./access/index'));
 
 module.exports = router;

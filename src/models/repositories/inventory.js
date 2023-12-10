@@ -41,9 +41,22 @@ const reservationInventory = async ({productId, quantity, cartId}) => {
     return inventory;
 }
 
+const updateInventoryStock = async (productId, quantity) => {
+    const inventory = await inventoryModel.findOneAndUpdate({
+        inventory_productId: convertToObjectId(productId),
+    }, {
+        $inc: {
+            inventory_stock: quantity
+        }
+    }, {new: true})
+    
+    return inventory;
+}
+
 module.exports = {
     createInventory,
     findInventoryByProductId,
     updateInventoryByProductId,
     reservationInventory,
+    updateInventoryStock,
 }
