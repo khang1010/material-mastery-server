@@ -11,7 +11,7 @@ class RedisService {
     static acquireLock = async (productId, quantity, cartId) => {
         const key = `lock_v1_${productId}`
         const retryTimes = 10;
-        const exprireTime = 1000;
+        const exprireTime = 120;
 
         for (let i = 0; i < retryTimes; i++) {
             const result = await redisClient.set(key, exprireTime, 'EX', exprireTime, 'NX');
