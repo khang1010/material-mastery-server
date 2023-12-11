@@ -3,6 +3,7 @@ const redisClient = require('../dbs/init-redis');
 const {promisify} = require('util');
 const { reservationInventory } = require('../models/repositories/inventory');
 const ProductService = require('./product.service');
+const { BadRequestError } = require('../core/error-response');
 const pexpire = promisify(redisClient.pexpire).bind(redisClient);
 const setnxAsync = promisify(redisClient.setnx).bind(redisClient);
 
