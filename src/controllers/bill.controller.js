@@ -22,6 +22,18 @@ class BillController {
             metadata: await BillService.restoreBill(req.params.id)
         }).send(res);
     }
+    static getAllImportBills = async (req, res, next) => {
+        new OkResponse({
+            message: "Get all import bills successfully",
+            metadata: await BillService.getAllImportBill(req.query)
+        }).send(res);
+    }
+    static getImportBillById = async (req, res, next) => {
+        new OkResponse({
+            message: "Get import bill successfully",
+            metadata: await BillService.getImportBillById(req.params.id)
+        }).send(res);
+    }
 }
 
 module.exports = BillController;

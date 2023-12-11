@@ -1,9 +1,10 @@
 'use strict';
 
 const { BadRequestError } = require("../core/error-response");
-const { createBill, deleteBillById, restoreBillById } = require("../models/repositories/bill");
+const { createBill, deleteBillById, restoreBillById, getBillsByUser, getProductsInBill } = require("../models/repositories/bill");
 const { updateInventoryStock } = require("../models/repositories/inventory");
 const { checkProductByServer } = require("../models/repositories/product");
+const { convertToObjectId } = require("../utils");
 const { getDiscountAmount } = require("./discount.service");
 const ProductService = require("./product.service");
 
@@ -81,6 +82,22 @@ class BillService {
         if (!restoredBill) throw new BadRequestError('Restore bill failed!!!');
         
         return restoredBill;
+    }
+    static getAllImportBill = async (payload) => {
+        return await getBillsByUser({...payload, filter: {
+            bill_type: 'import',
+            bill_status: 'pending',
+        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'bill_image', 'supplier', 'product_list', 'tax']});
+    }
+    static getImportBillById = async (billId) => {
+        const foundBill = await getBillsByUser({filter: {
+            _id: convertToObjectId(billId),
+            bill_type: 'import',
+        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'bill_image', 'supplier', 'product_list', 'tax']});
+        return {
+            bill_info: {...foundBill[0], product_list: undefined},
+            products_info: await getProductsInBill(foundBill[0].product_list),
+        }
     }
 }
 
