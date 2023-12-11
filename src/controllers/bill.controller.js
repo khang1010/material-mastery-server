@@ -10,6 +10,12 @@ class BillController {
             metadata: await BillService.createImportBill(req.body)
         }).send(res);
     }
+    static createExportBill = async (req, res, next) => {
+        new OkResponse({
+            message: "Create export bill successfully",
+            metadata: await BillService.createExportBill(req.body)
+        }).send(res);
+    }
     static deleteBill = async (req, res, next) => {
         new OkResponse({
             message: "Delete bill successfully",
@@ -28,10 +34,22 @@ class BillController {
             metadata: await BillService.getAllImportBill(req.query)
         }).send(res);
     }
+    static getAllExportBills = async (req, res, next) => {
+        new OkResponse({
+            message: "Get all export bills successfully",
+            metadata: await BillService.getAllExportBill(req.query)
+        }).send(res);
+    }
     static getImportBillById = async (req, res, next) => {
         new OkResponse({
             message: "Get import bill successfully",
             metadata: await BillService.getImportBillById(req.params.id)
+        }).send(res);
+    }
+    static getExportBillById = async (req, res, next) => {
+        new OkResponse({
+            message: "Get export bill successfully",
+            metadata: await BillService.getExportBillById(req.params.id)
         }).send(res);
     }
 }

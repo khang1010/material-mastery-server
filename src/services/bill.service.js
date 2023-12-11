@@ -1,7 +1,7 @@
 'use strict';
 
 const { BadRequestError } = require("../core/error-response");
-const { createBill, deleteBillById, restoreBillById, getBillsByUser, getProductsInBill } = require("../models/repositories/bill");
+const { createBill, deleteBillById, restoreBillById, getBillsByUser, getProductsInBill, createExportBill } = require("../models/repositories/bill");
 const { updateInventoryStock } = require("../models/repositories/inventory");
 const { checkProductByServer } = require("../models/repositories/product");
 const { convertToObjectId } = require("../utils");
@@ -21,9 +21,12 @@ class BillService {
             const {discounts = [], products = []} = orders[i];
             const checkProduct = await checkProductByServer(products);
             if (!checkProduct[0]) throw new BadRequestError('Order wrong!!!');
+            for (let j = 0; j < checkProduct.length; j++) {
+                checkProduct[j].product_price = products[j].price;
+            }
             
-            const checkoutPrice = checkProduct.reduce((acc, product) => {
-                return acc + (product.product_price * product.product_quantity);
+            const checkoutPrice = products.reduce((acc, product) => {
+                return acc + (product.price * product.quantity);
             }, 0)
             checkoutOrder.totalPrice += checkoutPrice;
             
@@ -36,7 +39,6 @@ class BillService {
             for (let i = 0; i < discounts.length; i++) {
                 const {discount = 0} = await getDiscountAmount({
                     discountId: discounts[i].discountId,
-                    userId,
                     products: checkProduct,
                 })
                 
@@ -68,8 +70,18 @@ class BillService {
         return newBill;
     }
     static createExportBill = async (payload) => {
-        const {checkout_items, checkoutOrder} = await this.checkoutReview(payload.orders);
-        return await createBill({...payload, bill_type: 'export', bill_checkout: checkoutOrder, product_list: checkout_items});
+        const {checkout_items, checkoutOrder} = await this.checkoutReview(payload.products);
+        const products = checkout_items.flatMap(item => item.item_products);
+        const newBill = await createExportBill({...payload, bill_checkout: checkoutOrder, product_list: checkout_items});
+        if (!newBill) throw new BadRequestError('Create bill failed!!!');
+        for (let i = 0; i < products.length; i++) {
+            const {productId, product_quantity} = products[i];
+            const updateInventory = await updateInventoryStock(productId, parseInt(product_quantity) * -1);
+            if (!updateInventory) throw new BadRequestError('Update inventory failed!!!');
+            const updateProduct = await ProductService.updateProductById(productId, {product_quantity: updateInventory.inventory_stock});
+            if (!updateProduct) throw new BadRequestError('Update product failed!!!');
+        }
+        return newBill;
     }
     static deleteBillById = async (billId) => {
         const deletedBill = await deleteBillById(billId);
@@ -84,10 +96,32 @@ class BillService {
         return restoredBill;
     }
     static getAllImportBill = async (payload) => {
-        return await getBillsByUser({...payload, filter: {
+        const foundBill = await getBillsByUser({...payload, filter: {
             bill_type: 'import',
             bill_status: 'pending',
         }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'bill_image', 'supplier', 'product_list', 'tax']});
+        const bills = [];
+        for (let i = 0; i < foundBill.length; i++) {
+            bills.push({
+                bill_info: {...foundBill[i], product_list: undefined},
+                products_info: await getProductsInBill(foundBill[i].product_list),
+            })
+        }
+        return bills;
+    }
+    static getAllExportBill = async (payload) => {
+        const foundBill = await getBillsByUser({...payload, filter: {
+            bill_type: 'export',
+            bill_status: 'pending',
+        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'supplier', 'product_list']});
+        const bills = [];
+        for (let i = 0; i < foundBill.length; i++) {
+            bills.push({
+                bill_info: {...foundBill[i], product_list: undefined, customer: foundBill[i].supplier, supplier: undefined},
+                products_info: await getProductsInBill(foundBill[i].product_list),
+            })
+        }
+        return bills;
     }
     static getImportBillById = async (billId) => {
         const foundBill = await getBillsByUser({filter: {
@@ -96,6 +130,16 @@ class BillService {
         }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'bill_image', 'supplier', 'product_list', 'tax']});
         return {
             bill_info: {...foundBill[0], product_list: undefined},
+            products_info: await getProductsInBill(foundBill[0].product_list),
+        }
+    }
+    static getExportBillById = async (billId) => {
+        const foundBill = await getBillsByUser({filter: {
+            _id: convertToObjectId(billId),
+            bill_type: 'export',
+        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'supplier', 'product_list']});
+        return {
+            bill_info: {...foundBill[0], product_list: undefined, customer: foundBill[0].supplier, supplier: undefined},
             products_info: await getProductsInBill(foundBill[0].product_list),
         }
     }

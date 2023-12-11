@@ -33,6 +33,34 @@ const createBill = async ({
     })
 }
 
+const createExportBill = async ({
+    bill_date = new Date(),
+    bill_note = '',
+    bill_type = 'export',
+    tax = 0,
+    customer = {},
+    product_list = [],
+    bill_status = 'pending',
+    bill_checkout = {},
+    bill_payment = {},
+    bill_address = {},
+    bill_image = ''
+}) => {
+    return await billModel.create({
+        bill_date,
+        bill_note,
+        bill_type,
+        tax,
+        supplier: customer,
+        product_list,
+        bill_status,
+        bill_checkout,
+        bill_payment,
+        bill_address,
+        bill_image
+    })
+}
+
 const deleteBillById = async (billId) => {
     return await billModel.findOneAndUpdate({ _id: billId }, {
         bill_status: 'deleted'
@@ -57,7 +85,7 @@ const getBillsByUser = async ({limit = 50, page = 1, sorted = ["_id"], filter = 
 
 const getProductsInBill = async (product_list) => {
     return await Promise.all(product_list.map(async (product) => {
-        const {productId, product_quantity} = product.item_products[0];
+        const {productId, product_quantity, product_price} = product.item_products[0];
         const foundProduct = await getProductById(productId, ["createdAt", "updatedAt", "__v", "product_slug", "_id"])
         if (!foundProduct) throw new NotFoundError('Product not found')
         const foundCategory = await getCategoryById(foundProduct.product_categories[0], ["category_name"])
@@ -66,7 +94,7 @@ const getProductsInBill = async (product_list) => {
             product_name: foundProduct.product_name,
             quantity: product_quantity,
             product_unit: foundProduct.product_unit,
-            product_price: foundProduct.product_price,
+            product_price: product_price,
             totalPrice: product.priceApplyDiscount,
             productId: product.productId
         }
@@ -79,4 +107,5 @@ module.exports = {
     restoreBillById,
     getBillsByUser,
     getProductsInBill,
+    createExportBill,
 }

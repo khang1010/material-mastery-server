@@ -98,7 +98,8 @@ const deleteProductInCart = async ({userId, product}) => {
 }
 
 const getUserCart = async (userId) => {
-    return await cartModel.findOne({ cart_userId: userId }).lean();
+    const foundCart = await cartModel.findOne({ cart_userId: userId }).lean();
+    return foundCart ? foundCart : {cart_products: []};
 }
 
 // const addProductToCart = async (userId, product) => {
