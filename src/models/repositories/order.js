@@ -1,5 +1,6 @@
 const moment = require('moment-timezone');
 const Order = require('../order.model');
+const { getSortAscending, getSortDescending, getUnSelectData } = require('../../utils');
 
 const calculateRevenueByTimeRange = async (startTime, endTime) => {
   const totalRevenue = await Order.aggregate([
@@ -72,10 +73,25 @@ const calculateRevenueByYear = async () => {
   return totalRevenue;
 };
 
+const getOrdersByUser = async ({limit = 50, page = 1, sorted = ["_id"], filter = {}, unSelect = [], isAscending = true}) => {
+  return await Order.find(filter)
+  .skip((page - 1) * limit)
+  .limit(limit)
+  .sort(isAscending === 'true' ? getSortAscending(sorted) : getSortDescending(sorted))
+  .select(getUnSelectData(unSelect))
+  .lean()
+}
+
+const updateOrderById = async (id, payload) => {
+  return await Order.findByIdAndUpdate(id, payload, { new: true });
+}
+
 module.exports = {
   calculateRevenueByDay,
   calculateRevenueByWeek,
   calculateRevenueByMonth,
   calculateRevenueByQuarter,
   calculateRevenueByYear,
+  getOrdersByUser,
+  updateOrderById,
 };

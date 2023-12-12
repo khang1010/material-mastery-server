@@ -95,6 +95,7 @@ class CheckoutService {
         const foundUser = await findUserById(userId);
         if (!foundUser) throw new NotFoundError('Not found user');
         const {checkout_items, checkoutOrder} = await this.checkoutReview({userId, orders});
+        if (checkout_items == []) throw new BadRequestError('Order wrong because no products!!!');
 
         const products = checkout_items.flatMap(item => item.item_products);
         // console.log(">>>products: ", products);
@@ -109,6 +110,7 @@ class CheckoutService {
         }
 
         if (acquireProducts.includes(false)) throw new BadRequestError('Something wrong with products!!!');
+        
         const newOrder = await orderModel.create({
             order_userId: convertToObjectId(userId),
             order_note,
