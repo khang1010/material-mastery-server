@@ -101,6 +101,49 @@ const getProductsInBill = async (product_list) => {
     }))
 }
 
+const calculateRevenueByTimeRange = async (startTime, endTime) => {
+    const totalRevenue = await billModel.aggregate([
+      {
+        $match: {
+          bill_date: {
+            $gte: startTime.toDate(),
+            $lt: endTime.toDate(),
+          },
+          bill_type: 'export'
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$bill_checkout.finalPrice' },
+        },
+      },
+    ]);
+    const totalImport = await billModel.aggregate([
+        {
+          $match: {
+            bill_date: {
+              $gte: startTime.toDate(),
+              $lt: endTime.toDate(),
+            },
+            bill_type: 'import'
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalImport: { $sum: '$bill_checkout.finalPrice' },
+          },
+        },
+      ]);
+      const revenue = totalRevenue.length ? totalRevenue[0].totalRevenue : 0;
+      const profit = totalImport.length ? revenue - totalImport[0].totalImport : revenue;
+    return {
+        revenue,
+        profit,
+    };
+};
+
 module.exports = {
     createBill,
     deleteBillById,
@@ -108,4 +151,5 @@ module.exports = {
     getBillsByUser,
     getProductsInBill,
     createExportBill,
+    calculateRevenueByTimeRange,
 }

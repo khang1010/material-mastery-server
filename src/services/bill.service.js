@@ -1,7 +1,7 @@
 'use strict';
-
+const moment = require('moment-timezone');
 const { BadRequestError } = require("../core/error-response");
-const { createBill, deleteBillById, restoreBillById, getBillsByUser, getProductsInBill, createExportBill } = require("../models/repositories/bill");
+const { createBill, deleteBillById, restoreBillById, getBillsByUser, getProductsInBill, createExportBill, calculateRevenueByTimeRange } = require("../models/repositories/bill");
 const { updateInventoryStock } = require("../models/repositories/inventory");
 const { checkProductByServer } = require("../models/repositories/product");
 const { convertToObjectId } = require("../utils");
@@ -142,6 +142,12 @@ class BillService {
             bill_info: {...foundBill[0], product_list: undefined, customer: foundBill[0].supplier, supplier: undefined},
             products_info: await getProductsInBill(foundBill[0].product_list),
         }
+    }
+    static calculateRevenueByTimeRange = async (payload) => {
+        const {start, end} = payload;
+        const startMoment = moment(start, 'DD/MM/YYYY').tz('Asia/Ho_Chi_Minh').startOf('day');
+        const endMoment = moment(end, 'DD/MM/YYYY').tz('Asia/Ho_Chi_Minh').endOf('day');
+        return await calculateRevenueByTimeRange(startMoment, endMoment);
     }
 }
 

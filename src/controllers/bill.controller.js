@@ -52,6 +52,12 @@ class BillController {
             metadata: await BillService.getExportBillById(req.params.id)
         }).send(res);
     }
+    static calculateRevenue = async (req, res, next) => {
+        new OkResponse({
+            message: "Calculate revenue successfully",
+            metadata: await BillService.calculateRevenueByTimeRange(req.query)
+        }).send(res);
+    }
 }
 
 module.exports = BillController;
