@@ -1,8 +1,8 @@
 'use strict';
-
+const moment = require('moment-timezone');
 const { BadRequestError } = require("../core/error-response");
 const { updateInventoryStock } = require("../models/repositories/inventory");
-const { getOrdersByUser, updateOrderById } = require("../models/repositories/order");
+const { getOrdersByUser, updateOrderById, calculateOrdersByTimeRange } = require("../models/repositories/order");
 const { convertToObjectId } = require("../utils");
 const ProductService = require("./product.service");
 
@@ -42,6 +42,20 @@ class OrderService {
             }
         }
         return order;
+    }
+    static getNumberOfOrderByTimeRange = async (payload) => {
+        const {start, end} = payload;
+        const startMoment = moment(start, 'DD/MM/YYYY').tz('Asia/Ho_Chi_Minh').startOf('day');
+        const endMoment = moment(end, 'DD/MM/YYYY').tz('Asia/Ho_Chi_Minh').endOf('day');
+        return {
+            pending: await calculateOrdersByTimeRange(startMoment, endMoment, 'pending'),
+            confirmed: await calculateOrdersByTimeRange(startMoment, endMoment, 'confirmed'),
+            cancelled: await calculateOrdersByTimeRange(startMoment, endMoment, 'cancelled'),
+            shipping: await calculateOrdersByTimeRange(startMoment, endMoment, 'shipping'),
+            shipped: await calculateOrdersByTimeRange(startMoment, endMoment, 'shipped'),
+            delivered: await calculateOrdersByTimeRange(startMoment, endMoment, 'delivered'),
+            failed: await calculateOrdersByTimeRange(startMoment, endMoment, 'failed'),
+        }
     }
 }
 

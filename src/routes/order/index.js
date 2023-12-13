@@ -12,5 +12,6 @@ router.get('/find/:id', asyncHandler(OrderController.getOrderById));
 router.use(permission('staff'))
 router.get('/staff', asyncHandler(OrderController.getOrdersByStaff));
 router.patch('/status/:id', asyncHandler(OrderController.updateOrderStatusById));
+router.get('/number', asyncHandler(OrderController.getNumberOfOrderByTimeRange));
 
 module.exports = router;

@@ -9,7 +9,7 @@ var orderSchema = new mongoose.Schema({
     order_address: {type: Object, default: {}},
     order_checkout: {type: Object, default: {}},
     order_products: {type: Array, required: true, default: []},
-    order_status: {type: String, enum: ['pending', 'confirmed', 'shipped', 'cancelled', 'delivered'], default: 'pending'},
+    order_status: {type: String, enum: ['pending', 'confirmed', 'shipping', 'shipped', 'cancelled', 'failed', 'delivered'], default: 'pending'},
     order_note: {type: String, default: ''},
     order_phone: {type: String, default: ''},
     order_date: {type: Date, default: Date.now},

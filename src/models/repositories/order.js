@@ -86,6 +86,28 @@ const updateOrderById = async (id, payload) => {
   return await Order.findByIdAndUpdate(id, payload, { new: true });
 }
 
+const calculateOrdersByTimeRange = async (startTime, endTime, status) => {
+  const totalPendingOrders = await Order.aggregate([
+    {
+      $match: {
+        order_date: {
+          $gte: startTime.toDate(),
+          $lt: endTime.toDate(),
+        },
+        order_status: status,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalPendingOrders: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return totalPendingOrders.length ? totalPendingOrders[0].totalPendingOrders : 0;
+};
+
 module.exports = {
   calculateRevenueByDay,
   calculateRevenueByWeek,
@@ -94,4 +116,5 @@ module.exports = {
   calculateRevenueByYear,
   getOrdersByUser,
   updateOrderById,
+  calculateOrdersByTimeRange,
 };
