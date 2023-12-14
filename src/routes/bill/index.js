@@ -10,6 +10,7 @@ router.use(permission('staff'))
 router.post('/export', asyncHandler(BillController.createExportBill));
 router.get('/export/:id', asyncHandler(BillController.getExportBillById));
 router.get('/export', asyncHandler(BillController.getAllExportBills));
+router.get('/number', asyncHandler(BillController.getNumberOfBill));
 router.use(permission('manager'))
 router.post('/import', asyncHandler(BillController.createImportBill));
 router.get('/import/:id', asyncHandler(BillController.getImportBillById));

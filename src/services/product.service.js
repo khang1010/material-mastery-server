@@ -6,7 +6,7 @@ const productModel = require("../models/product.model");
 const { getAllCategoriesByFilter, getCategoryById } = require("../models/repositories/category");
 const { updateInventoryByProductId } = require("../models/repositories/inventory");
 const { createOrUpdateNotificationByType, checkProductExists, deleteProductInStaffNotification } = require("../models/repositories/notification");
-const { findProductByName, createProduct, getAllProduct, deleteProductById, updateProductById, getProductById, getAllProductsByUser, publishProduct, unPublishProduct } = require("../models/repositories/product");
+const { findProductByName, createProduct, getAllProduct, deleteProductById, updateProductById, getProductById, getAllProductsByUser, publishProduct, unPublishProduct, getNumberOfProducts, getNumberOfProductsByCategory } = require("../models/repositories/product");
 const { removeUndefinedObject, updateNestedObject } = require("../utils");
 const content = {
     "STAFF-001": "There is a risk of product shortage in quantity (<=5)",
@@ -117,6 +117,18 @@ class ProductService {
 
     static async unPublishProduct(payload) {
         return await unPublishProduct(payload);
+    }
+    static async getNumberOfProducts() {
+        return {
+            draft: await getNumberOfProducts(true),
+            published: await getNumberOfProducts(false),
+        }
+    }
+    static async getNumberOfProductsByCategoryId(category) {
+        return {
+            draft: await getNumberOfProductsByCategory(category, true),
+            published: await getNumberOfProductsByCategory(category, false),
+        }
     }
 }
 

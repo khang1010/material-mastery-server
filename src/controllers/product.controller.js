@@ -56,6 +56,18 @@ class ProductController {
             metadata: await ProductService.unPublishProduct({id: req.params.id}),
         }).send(res);
     }
+    static getNumberOfProducts = async (req, res, next) => {
+        new OkResponse({
+            message: "Get number of products successfully",
+            metadata: await ProductService.getNumberOfProducts(),
+        }).send(res);
+    }
+    static getNumberOfProductsByCategory = async (req, res, next) => {
+        new OkResponse({
+            message: "Get number of products by category successfully",
+            metadata: await ProductService.getNumberOfProductsByCategoryId(req.params.category),
+        }).send(res);
+    }
 }
 
 module.exports = ProductController;

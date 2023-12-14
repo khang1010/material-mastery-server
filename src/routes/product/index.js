@@ -4,9 +4,11 @@ const ProductController = require('../../controllers/product.controller');
 const { authentication, permission } = require('../../auth/checkAuth');
 const router = express.Router();
 
+router.get('/number', asyncHandler(ProductController.getNumberOfProducts));
+router.get('/number/:category', asyncHandler(ProductController.getNumberOfProductsByCategory));
+router.get('/category/:id', asyncHandler(ProductController.getProductByCategoryId));
 router.get('/', asyncHandler(ProductController.getAll));
 router.get('/:id', asyncHandler(ProductController.getProductById));
-router.get('/category/:id', asyncHandler(ProductController.getProductByCategoryId));
 
 router.use(authentication);
 router.use(permission('staff'));

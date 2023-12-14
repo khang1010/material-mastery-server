@@ -82,6 +82,40 @@ const checkProductByServer = async (products) => {
     }))
 }
 
+const getNumberOfProducts = async (isDraft) => {
+    const totalProducts = await product.aggregate([
+        {
+            $match: {
+                isDraft: isDraft,
+            }
+        },
+          {
+            $group: {
+              _id: null,
+              totalBills: { $sum: 1 },
+            },
+          },
+    ])
+    return totalProducts.length ? totalProducts[0].totalBills : 0;
+}
+
+const getNumberOfProductsByCategory = async (category, isDraft) => {
+    const totalProducts = await product.aggregate([
+        {
+            $match: {
+                isDraft: isDraft,
+                product_categories: {$in: [category]},
+            }
+        }, {
+            $group: {
+              _id: null,
+              totalBills: { $sum: 1 },
+            },
+        }
+    ]);
+    return totalProducts.length ? totalProducts[0].totalBills : 0;
+}
+
 module.exports = {
     findProductByName,
     createProduct,
@@ -93,4 +127,6 @@ module.exports = {
     publishProduct,
     unPublishProduct,
     checkProductByServer,
+    getNumberOfProducts,
+    getNumberOfProductsByCategory,
 }

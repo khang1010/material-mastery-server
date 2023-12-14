@@ -58,6 +58,12 @@ class BillController {
             metadata: await BillService.calculateRevenueByTimeRange(req.query)
         }).send(res);
     }
+    static getNumberOfBill = async (req, res, next) => {
+        new OkResponse({
+            message: "Get number of bill successfully",
+            metadata: await BillService.getNumberOfBill()
+        }).send(res);
+    }
 }
 
 module.exports = BillController;

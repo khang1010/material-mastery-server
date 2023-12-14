@@ -144,6 +144,24 @@ const calculateRevenueByTimeRange = async (startTime, endTime) => {
     };
 };
 
+const calculateNumberOfBillByType = async (type) => {
+  const totalBills = await billModel.aggregate([
+    {
+      $match: {
+        bill_type: type,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalBills: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return totalBills.length ? totalBills[0].totalBills : 0;
+};
+
 module.exports = {
     createBill,
     deleteBillById,
@@ -152,4 +170,5 @@ module.exports = {
     getProductsInBill,
     createExportBill,
     calculateRevenueByTimeRange,
+    calculateNumberOfBillByType,
 }
