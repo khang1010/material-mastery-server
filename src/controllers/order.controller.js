@@ -34,6 +34,12 @@ class OrderController {
             metadata: await OrderService.getNumberOfOrderByTimeRange(req.query)
         }).send(res);
     }
+    static cancelProductByCustomer = async (req, res, next) => {
+        new OkResponse({
+            message: "Cancel product successfully",
+            metadata: await OrderService.cancelOrderByUser({orderId: req.params.id})
+        }).send(res);
+    }
 }
 
 module.exports = OrderController;

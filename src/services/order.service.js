@@ -43,6 +43,27 @@ class OrderService {
         }
         return order;
     }
+    static cancelOrderByUser = async (payload) => {
+        const {orderId} = payload;
+        const foundOrder = await getOrdersByUser({filter: {
+            _id: convertToObjectId(orderId)
+        }});
+        if (!foundOrder[0]) throw new BadRequestError("Order not found");
+        if (foundOrder[0].order_status == 'cancelled') throw new BadRequestError("Order already cancelled");
+        if (foundOrder[0].order_status != 'pending') throw new BadRequestError("You can't cancel it");
+        const order = await updateOrderById(orderId, {order_status: 'cancelled'});
+        if (!order) throw new BadRequestError("Cancel Product failed");
+        const {order_products = []} = order;
+        for (let i = 0; i < order_products.length; i++) {
+            const {item_products} = order_products[i];
+            const {productId, product_quantity} = item_products[0];
+            const updateInventory = await updateInventoryStock(productId, parseInt(product_quantity));
+            if (!updateInventory) throw new BadRequestError('Update inventory failed!!!');
+            const updateProduct = await ProductService.updateProductById(productId, {product_quantity: updateInventory.inventory_stock});
+            if (!updateProduct) throw new BadRequestError('Update product failed!!!');
+        }
+        return order;
+    }
     static getNumberOfOrderByTimeRange = async (payload) => {
         const {start, end} = payload;
         const startMoment = moment(start, 'DD/MM/YYYY').tz('Asia/Ho_Chi_Minh').startOf('day');
