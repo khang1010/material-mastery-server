@@ -2,7 +2,7 @@
 
 const { Types } = require("mongoose");
 const { NotFoundError, BadRequestError } = require("../core/error-response");
-const { getUserCart } = require("../models/repositories/cart");
+const { getUserCart, findProductInCartv2, deleteProductInCart } = require("../models/repositories/cart");
 const { checkProductByServer } = require("../models/repositories/product");
 const { getDiscountAmount } = require("./discount.service");
 const RedisService = require("./redis.service");
@@ -120,6 +120,14 @@ class CheckoutService {
             order_checkout: checkoutOrder,
             order_products: checkout_items
         })
+
+        for (let i = 0; i < products.length; i++) {
+            const {productId, product_quantity} = products[i];
+            const productInCart = await findProductInCartv2(userId, productId);
+            if (productInCart) {
+                await deleteProductInCart({userId, product: {productId, product_quantity}});
+            }
+        }
 
         return newOrder;
     }

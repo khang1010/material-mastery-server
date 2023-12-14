@@ -72,6 +72,26 @@ const findProductInCart = async (userId, productId) => {
     return productInCart;
 }
 
+const findProductInCartv2 = async (userId, productId) => {
+    // Assume you have a cartModel or a collection to store the cart data
+    const cart = await cartModel.findOne({
+        cart_userId: userId,
+        'cart_products.productId': productId,
+        cart_state: 'active'
+    });
+
+    if (!cart) {
+        return 0;
+    }
+
+    const productInCart = cart.cart_products.find(product => product.productId == productId);
+    if (!productInCart) {
+        return 0;
+    }
+
+    return 1;
+}
+
 const deleteProductInCart = async ({userId, product}) => {
     const foundCart = await cartModel.findOne({
         cart_userId: userId,
@@ -124,4 +144,5 @@ module.exports = {
     deleteProductInCart,
     getUserCart,
     findProductInCart,
+    findProductInCartv2,
 }
