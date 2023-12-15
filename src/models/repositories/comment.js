@@ -6,6 +6,7 @@ const { NotFoundError, BadRequestError } = require("../../core/error-response");
 const { getProductById } = require("./product");
 const { updateProductRating } = require("../../services/product.service");
 const { findUserById } = require("./user");
+const { user } = require("../user.model");
 
 const createComment = async ({productId, userId, content, parentId = null, rating = 1}) => {
     let right;
@@ -67,7 +68,12 @@ const getCommentByParentId = async ({
         }).sort({
             comment_left: 1
         }).lean();
-    
+        
+        for (const comment of comments) {
+            const foundUser = await findUserById(comment.comment_userId);
+            comment.user_avatar = foundUser.avatar;
+        }
+        
         return comments;
     };
     const parent = await commentModel.findById(parentId);
@@ -79,7 +85,11 @@ const getCommentByParentId = async ({
     }).sort({
         comment_left: 1
     }).lean();
-
+    for (const comment of comments) {
+        const foundUser = await findUserById(comment.comment_userId);
+        comment.user_avatar = foundUser.avatar;
+    }
+    // console.log(">>>comments: ", comments)
     return comments;
 }
 

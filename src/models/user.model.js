@@ -7,6 +7,10 @@ const COLLECTION_NAME = 'users'
 
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema({
+    avatar: {
+        type: String,
+        default: ''
+    },
     username: {
         type: String,
         required: true,
