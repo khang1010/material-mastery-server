@@ -44,7 +44,11 @@ class OrderService {
         const foundOrder = await getOrdersByUser({filter: {
             _id: convertToObjectId(id)
         }, unSelect: ["__v"]});
-        return foundOrder[0];
+        const user = await findUserById(foundOrder[0].order_userId.toString());
+        return {
+            ...foundOrder[0],
+            order_username: user.display_name
+        };
     }
     static updateOrderStatusById = async (payload) => {
         const {orderId, status} = payload;
