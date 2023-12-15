@@ -7,6 +7,7 @@ const OrderController = require('../../controllers/order.controller');
 const router = express.Router();
 
 router.use(authentication)
+router.get('/customer/number', asyncHandler(OrderController.getNumberOfOrdersByCustomer));
 router.get('/find/:id', asyncHandler(OrderController.getOrderById));
 router.patch('/cancel/:id', asyncHandler(OrderController.cancelProductByCustomer));
 router.get('/', asyncHandler(OrderController.getOrdersByCustomer));

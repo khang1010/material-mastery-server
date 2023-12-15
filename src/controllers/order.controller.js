@@ -40,6 +40,12 @@ class OrderController {
             metadata: await OrderService.cancelOrderByUser({orderId: req.params.id})
         }).send(res);
     }
+    static getNumberOfOrdersByCustomer = async (req, res, next) => {
+        new OkResponse({
+            message: "Get number of orders successfully",
+            metadata: await OrderService.getNumberOfOrdersByCustomer(req.user.userId)
+        }).send(res);
+    }
 }
 
 module.exports = OrderController;

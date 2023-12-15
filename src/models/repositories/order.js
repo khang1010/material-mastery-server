@@ -1,6 +1,6 @@
 const moment = require('moment-timezone');
 const Order = require('../order.model');
-const { getSortAscending, getSortDescending, getUnSelectData } = require('../../utils');
+const { getSortAscending, getSortDescending, getUnSelectData, convertToObjectId } = require('../../utils');
 
 const calculateRevenueByTimeRange = async (startTime, endTime) => {
   const totalRevenue = await Order.aggregate([
@@ -108,6 +108,23 @@ const calculateOrdersByTimeRange = async (startTime, endTime, status) => {
   return totalPendingOrders.length ? totalPendingOrders[0].totalPendingOrders : 0;
 };
 
+const getNumberOfOrdersByCustomer = async (userId) => {
+  const totalOrders = await Order.aggregate([
+    {
+      $match: {
+        order_userId: convertToObjectId(userId),
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalOrders: { $sum: 1 },
+      },
+    },
+  ]);
+  return totalOrders.length ? totalOrders[0].totalOrders : 0;
+}
+
 module.exports = {
   calculateRevenueByDay,
   calculateRevenueByWeek,
@@ -117,4 +134,5 @@ module.exports = {
   getOrdersByUser,
   updateOrderById,
   calculateOrdersByTimeRange,
+  getNumberOfOrdersByCustomer,
 };

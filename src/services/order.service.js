@@ -2,7 +2,7 @@
 const moment = require('moment-timezone');
 const { BadRequestError } = require("../core/error-response");
 const { updateInventoryStock } = require("../models/repositories/inventory");
-const { getOrdersByUser, updateOrderById, calculateOrdersByTimeRange } = require("../models/repositories/order");
+const { getOrdersByUser, updateOrderById, calculateOrdersByTimeRange, getNumberOfOrdersByCustomer } = require("../models/repositories/order");
 const { convertToObjectId } = require("../utils");
 const ProductService = require("./product.service");
 const { findUserById } = require('../models/repositories/user');
@@ -97,6 +97,9 @@ class OrderService {
             delivered: await calculateOrdersByTimeRange(startMoment, endMoment, 'delivered'),
             failed: await calculateOrdersByTimeRange(startMoment, endMoment, 'failed'),
         }
+    }
+    static getNumberOfOrdersByCustomer = async (userId) => {
+        return await getNumberOfOrdersByCustomer(userId);
     }
 }
 
