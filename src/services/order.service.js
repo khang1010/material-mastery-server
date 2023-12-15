@@ -5,20 +5,40 @@ const { updateInventoryStock } = require("../models/repositories/inventory");
 const { getOrdersByUser, updateOrderById, calculateOrdersByTimeRange } = require("../models/repositories/order");
 const { convertToObjectId } = require("../utils");
 const ProductService = require("./product.service");
+const { findUserById } = require('../models/repositories/user');
 
 class OrderService {
     static getOrdersByCustomer = async (payload) => {
-        return await getOrdersByUser({...payload, filter: {
+        const order = await getOrdersByUser({...payload, filter: {
             order_userId: convertToObjectId(payload.userId)
         }, unSelect: ["order_userId", "__v"]});
+        // console.log(">>>order: ", order);
+        if (!order) throw new BadRequestError("Get orders failed");
+        const user = await findUserById(payload.userId);
+        if (!user) throw new BadRequestError("Get orders failed");
+        return {
+            orders: order,
+            order_username: user.display_name
+        };
     }
     static getOrdersByStaff = async (payload) => {
         const {status} = payload;
-        console.log(">>>status: ", status);
-        if (!status) return await getOrdersByUser({...payload, unSelect: ["__v"]});
-        return await getOrdersByUser({...payload, unSelect: ["__v"], filter: {
-            order_status: status
-        }});
+        // console.log(">>>status: ", status);
+        let order = [];
+        if (!status) {
+            order = await getOrdersByUser({...payload, unSelect: ["__v"]});
+        } else {
+            order = await getOrdersByUser({...payload, unSelect: ["__v"], filter: {
+                order_status: status
+            }});
+        }
+        if (!order) throw new BadRequestError("Get orders failed");
+        for (let i = 0; i < order.length; i++) {
+            const user = await findUserById(order[i].order_userId.toString());
+            if (!user) throw new BadRequestError("Get orders failed");  
+            order[i].order_username = user.display_name; 
+        }
+        return order;
     }
     static getOrderById = async (id) => {
         const foundOrder = await getOrdersByUser({filter: {
