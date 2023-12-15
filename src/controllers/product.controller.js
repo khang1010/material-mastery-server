@@ -68,6 +68,12 @@ class ProductController {
             metadata: await ProductService.getNumberOfProductsByCategoryId(req.params.category),
         }).send(res);
     }
+    static searchProductsByUser = async (req, res, next) => {
+        new OkResponse({
+            message: "Search products successfully",
+            metadata: await ProductService.searchProductsByUser({keySearch: req.query.keySearch}),
+        }).send(res);
+    }
 }
 
 module.exports = ProductController;

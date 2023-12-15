@@ -116,6 +116,16 @@ const getNumberOfProductsByCategory = async (category, isDraft) => {
     return totalProducts.length ? totalProducts[0].totalBills : 0;
 }
 
+const searchProductsByUser = async ({keySearch}) => {
+    const regexSearch = new RegExp(keySearch);
+    return await product.find({
+        isDraft: false,
+        $text: {
+            $search: regexSearch
+        },
+    }, {score: {$meta: "textScore"}}).sort({score: { $meta: "textScore" }}).lean()
+}
+
 module.exports = {
     findProductByName,
     createProduct,
@@ -129,4 +139,5 @@ module.exports = {
     checkProductByServer,
     getNumberOfProducts,
     getNumberOfProductsByCategory,
+    searchProductsByUser,
 }
