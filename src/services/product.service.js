@@ -4,7 +4,7 @@ const { BadRequestError, NotFoundError } = require("../core/error-response");
 const commentModel = require("../models/comment.model");
 const productModel = require("../models/product.model");
 const { getAllCategoriesByFilter, getCategoryById } = require("../models/repositories/category");
-const { updateInventoryByProductId } = require("../models/repositories/inventory");
+const { updateInventoryByProductId, findInventoryByProductId } = require("../models/repositories/inventory");
 const { createOrUpdateNotificationByType, checkProductExists, deleteProductInStaffNotification } = require("../models/repositories/notification");
 const { findProductByName, createProduct, getAllProduct, deleteProductById, updateProductById, getProductById, getAllProductsByUser, publishProduct, unPublishProduct, getNumberOfProducts, getNumberOfProductsByCategory, searchProductsByUser } = require("../models/repositories/product");
 const { removeUndefinedObject, updateNestedObject } = require("../utils");
@@ -132,6 +132,18 @@ class ProductService {
     }
     static async searchProductsByUser({ keySearch }) {
         return await searchProductsByUser({ keySearch });
+    }
+    static async getSellingProducts(payload) {
+        const products = await getAllProductsByUser({...payload, filter: {
+            isDraft: false,
+        }});
+        for (const product of products) {
+            const inventory = await findInventoryByProductId(product._id.toString());
+            product.product_reservations = inventory ? inventory.inventory_reservations.length : 0;
+            // console.log(">>>product: ", inventory.inventory_reservations.length);
+        }
+        products.sort((a, b) => b.product_reservations - a.product_reservations);
+        return products;
     }
 }
 

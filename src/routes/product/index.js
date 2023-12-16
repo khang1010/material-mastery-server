@@ -8,6 +8,7 @@ router.get('/number', asyncHandler(ProductController.getNumberOfProducts));
 router.get('/number/:category', asyncHandler(ProductController.getNumberOfProductsByCategory));
 router.get('/category/:id', asyncHandler(ProductController.getProductByCategoryId));
 router.get('/search', asyncHandler(ProductController.searchProductsByUser));
+router.get('/selling', asyncHandler(ProductController.getSellingProducts));
 router.get('/', asyncHandler(ProductController.getAll));
 router.get('/:id', asyncHandler(ProductController.getProductById));
 
