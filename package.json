@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest --collect-coverage --detectOpenHandles",
+    "test": "jest --collect-coverage --detectOpenHandles --reporters=\"default\" --reporters=\"jest-html-reporters\"",
     "start": "nodemon server.js",
     "start-server": "node server.js"
   },
@@ -37,7 +37,7 @@
     "compression": "^1.7.4",
     "helmet": "^7.0.0",
     "jest": "^29.7.0",
-    "morgan": "^1.10.0",
-    "supertest": "^6.3.3"
+    "jest-html-reporters": "^3.1.5",
+    "morgan": "^1.10.0"
   }
 }
