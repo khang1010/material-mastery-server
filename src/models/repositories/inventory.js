@@ -41,6 +41,20 @@ const reservationInventory = async ({productId, quantity, cartId}) => {
     return inventory;
 }
 
+const pullReservationInventory = async (productId, quantity) => {
+    const inventory = await inventoryModel.findOneAndUpdate({
+        inventory_productId: convertToObjectId(productId),
+    }, {
+        $inc: {
+            inventory_stock: quantity
+        }, $pop: {
+            inventory_reservations: -1
+        },
+    }, {new: true})
+    
+    return inventory;
+}
+
 const updateInventoryStock = async (productId, quantity) => {
     const inventory = await inventoryModel.findOneAndUpdate({
         inventory_productId: convertToObjectId(productId),
@@ -59,4 +73,5 @@ module.exports = {
     updateInventoryByProductId,
     reservationInventory,
     updateInventoryStock,
+    pullReservationInventory,
 }

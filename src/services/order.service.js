@@ -1,7 +1,7 @@
 'use strict';
 const moment = require('moment-timezone');
 const { BadRequestError } = require("../core/error-response");
-const { updateInventoryStock } = require("../models/repositories/inventory");
+const { updateInventoryStock, pullReservationInventory } = require("../models/repositories/inventory");
 const { getOrdersByUser, updateOrderById, calculateOrdersByTimeRange, getNumberOfOrdersByCustomer } = require("../models/repositories/order");
 const { convertToObjectId } = require("../utils");
 const ProductService = require("./product.service");
@@ -59,7 +59,7 @@ class OrderService {
             for (let i = 0; i < order_products.length; i++) {
                 const {item_products} = order_products[i];
                 const {productId, product_quantity} = item_products[0];
-                const updateInventory = await updateInventoryStock(productId, parseInt(product_quantity));
+                const updateInventory = await pullReservationInventory(productId, parseInt(product_quantity));
                 if (!updateInventory) throw new BadRequestError('Update inventory failed!!!');
                 const updateProduct = await ProductService.updateProductById(productId, {product_quantity: updateInventory.inventory_stock});
                 if (!updateProduct) throw new BadRequestError('Update product failed!!!');
@@ -81,7 +81,7 @@ class OrderService {
         for (let i = 0; i < order_products.length; i++) {
             const {item_products} = order_products[i];
             const {productId, product_quantity} = item_products[0];
-            const updateInventory = await updateInventoryStock(productId, parseInt(product_quantity));
+            const updateInventory = await pullReservationInventory(productId, parseInt(product_quantity));
             if (!updateInventory) throw new BadRequestError('Update inventory failed!!!');
             const updateProduct = await ProductService.updateProductById(productId, {product_quantity: updateInventory.inventory_stock});
             if (!updateProduct) throw new BadRequestError('Update product failed!!!');
