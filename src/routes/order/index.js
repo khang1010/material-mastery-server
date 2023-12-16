@@ -12,6 +12,7 @@ router.get('/find/:id', asyncHandler(OrderController.getOrderById));
 router.patch('/cancel/:id', asyncHandler(OrderController.cancelProductByCustomer));
 router.get('/', asyncHandler(OrderController.getOrdersByCustomer));
 router.use(permission('staff'))
+router.get('/staff/time', asyncHandler(OrderController.getOrdersByTimeRange));
 router.get('/staff', asyncHandler(OrderController.getOrdersByStaff));
 router.patch('/status/:id', asyncHandler(OrderController.updateOrderStatusById));
 router.get('/number', asyncHandler(OrderController.getNumberOfOrderByTimeRange));

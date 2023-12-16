@@ -46,6 +46,12 @@ class OrderController {
             metadata: await OrderService.getNumberOfOrdersByCustomer(req.user.userId)
         }).send(res);
     }
+    static getOrdersByTimeRange = async (req, res, next) => {
+        new OkResponse({
+            message: "Get orders successfully",
+            metadata: await OrderService.getOrdersByTimeRange(req.query)
+        }).send(res);
+    }
 }
 
 module.exports = OrderController;

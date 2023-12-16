@@ -105,6 +105,26 @@ class OrderService {
     static getNumberOfOrdersByCustomer = async (userId) => {
         return await getNumberOfOrdersByCustomer(userId);
     }
+    static getOrdersByTimeRange = async (payload) => {
+        const {start, end, status} = payload;
+        const startMoment = moment(start, 'DD/MM/YYYY').tz('Asia/Ho_Chi_Minh').startOf('day');
+        const endMoment = moment(end, 'DD/MM/YYYY').tz('Asia/Ho_Chi_Minh').endOf('day');
+        if (!status) {
+            return await getOrdersByUser({filter: {
+                order_date: {
+                    $gte: startMoment.toDate(),
+                    $lt: endMoment.toDate(),
+                },
+            }});
+        }
+        return await getOrdersByUser({filter: {
+            order_date: {
+                $gte: startMoment.toDate(),
+                $lt: endMoment.toDate(),
+            },
+            order_status: status,
+        }});
+    }
 }
 
 module.exports = OrderService;

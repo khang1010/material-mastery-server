@@ -108,6 +108,28 @@ const calculateOrdersByTimeRange = async (startTime, endTime, status) => {
   return totalPendingOrders.length ? totalPendingOrders[0].totalPendingOrders : 0;
 };
 
+// const getOrdersByTimeRange = async (startTime, endTime, status) => {
+//   const totalOrders = await Order.aggregate([
+//     {
+//       $match: {
+//         order_date: {
+//           $gte: startTime.toDate(),
+//           $lt: endTime.toDate(),
+//         },
+//         order_status: status,
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: null,
+//         totalOrders: { $sum: 1 },
+//       },
+//     },
+//   ]);
+
+//   return totalOrders.length ? totalOrders[0].totalOrders : 0;
+// };
+
 const getNumberOfOrdersByCustomer = async (userId) => {
   const totalOrders = await Order.aggregate([
     {
