@@ -32,9 +32,6 @@ const { calculateRevenueByDay, calculateRevenueByMonth, calculateRevenueByWeek, 
  */
 class CheckoutService {
     static checkoutReview = async ({userId, orders}) => {
-        const foundCart = await getUserCart(userId);
-        if (!foundCart) throw new NotFoundError('Not found cart');
-        // console.log(">>>Orders: ", orders)
         const checkoutOrder = {
             totalPrice: 0,
             feeShip: 0,

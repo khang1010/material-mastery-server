@@ -26,11 +26,15 @@ app.use(
 );
 app.use(cors());
 
-// init routes
-app.use('/', require('./routes/index'));
-
 // init database
 instanceMongoDb;
+app.use((req, res, next) => {
+  req.io = instanceMongoDb.io; // Pass io instance to the request object
+  next();
+});
+
+// init routes
+app.use('/', require('./routes/index'));
 
 // handle error
 app.use((req, res, next) => {
