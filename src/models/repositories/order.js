@@ -130,11 +130,12 @@ const calculateOrdersByTimeRange = async (startTime, endTime, status) => {
 //   return totalOrders.length ? totalOrders[0].totalOrders : 0;
 // };
 
-const getNumberOfOrdersByCustomer = async (userId) => {
+const getNumberOfOrdersByCustomer = async (userId, status) => {
   const totalOrders = await Order.aggregate([
     {
       $match: {
         order_userId: convertToObjectId(userId),
+        order_status: status,
       },
     },
     {

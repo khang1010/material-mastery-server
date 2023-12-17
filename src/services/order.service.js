@@ -103,7 +103,15 @@ class OrderService {
         }
     }
     static getNumberOfOrdersByCustomer = async (userId) => {
-        return await getNumberOfOrdersByCustomer(userId);
+        return {
+            pending: await getNumberOfOrdersByCustomer(userId, 'pending'),
+            confirmed: await getNumberOfOrdersByCustomer(userId, 'confirmed'),
+            cancelled: await getNumberOfOrdersByCustomer(userId, 'cancelled'),
+            shipping: await getNumberOfOrdersByCustomer(userId, 'shipping'),
+            shipped: await getNumberOfOrdersByCustomer(userId, 'shipped'),
+            delivered: await getNumberOfOrdersByCustomer(userId, 'delivered'),
+            failed: await getNumberOfOrdersByCustomer(userId, 'failed'),
+        }
     }
     static getOrdersByTimeRange = async (payload) => {
         const {start, end, status} = payload;
