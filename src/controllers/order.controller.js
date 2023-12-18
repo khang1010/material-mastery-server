@@ -16,6 +16,12 @@ class OrderController {
             metadata: await OrderService.getOrdersByStaff(req.query)
         }).send(res);
     }
+    static getOrdersByPaymentStatus = async (req, res, next) => {
+        new OkResponse({
+            message: "Get orders successfully",
+            metadata: await OrderService.getOrdersByPaymentStatus(req.query)
+        }).send(res);
+    }
     static getOrderById = async (req, res, next) => {
         new OkResponse({
             message: "Get order successfully",

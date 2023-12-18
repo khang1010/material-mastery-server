@@ -40,6 +40,24 @@ class OrderService {
         }
         return order;
     }
+    static getOrdersByPaymentStatus = async (payload) => {
+        const {status} = payload;
+        let order = [];
+        if (!status) {
+            order = await getOrdersByUser({...payload, unSelect: ["__v"]});
+        } else {
+            order = await getOrdersByUser({...payload, unSelect: ["__v"], filter: {
+                'order_payment.status': status
+            }});
+        }
+        if (!order) throw new BadRequestError("Get orders failed");
+        for (let i = 0; i < order.length; i++) {
+            const user = await findUserById(order[i].order_userId.toString());
+            if (!user) throw new BadRequestError("Get orders failed");  
+            order[i].order_username = user.display_name; 
+        }
+        return order;
+    }
     static getOrderById = async (id) => {
         const foundOrder = await getOrdersByUser({filter: {
             _id: convertToObjectId(id)
