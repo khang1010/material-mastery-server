@@ -8,9 +8,11 @@ const swaggerUI = require('swagger-ui-express');
 const swaggerDocument = require('./utils/swagger');
 const redisClient = require('./dbs/init-redis');
 const cors = require('cors');
+const SocketService = require('./services/socket.service');
 require('dotenv').config();
 require('./helpers/billCleanup');
 const app = express();
+app.use(cors());
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
@@ -24,14 +26,9 @@ app.use(
     extended: true,
   })
 );
-app.use(cors());
 
 // init database
 instanceMongoDb;
-app.use((req, res, next) => {
-  req.io = instanceMongoDb.io; // Pass io instance to the request object
-  next();
-});
 
 // init routes
 app.use('/', require('./routes/index'));
