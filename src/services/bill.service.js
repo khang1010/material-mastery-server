@@ -99,7 +99,7 @@ class BillService {
         const foundBill = await getBillsByUser({...payload, filter: {
             bill_type: 'import',
             bill_status: 'pending',
-        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'bill_image', 'supplier', 'product_list', 'tax']});
+        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'bill_image', 'supplier', 'product_list', 'tax', '_id']});
         const bills = [];
         for (let i = 0; i < foundBill.length; i++) {
             bills.push({
@@ -113,7 +113,7 @@ class BillService {
         const foundBill = await getBillsByUser({...payload, filter: {
             bill_type: 'export',
             bill_status: 'pending',
-        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'supplier', 'product_list']});
+        }, select: ['bill_date', 'bill_note', 'bill_checkout', 'bill_payment', 'bill_address', 'supplier', 'product_list', '_id']});
         const bills = [];
         for (let i = 0; i < foundBill.length; i++) {
             bills.push({
