@@ -151,6 +151,17 @@ class OrderService {
             order_status: status,
         }});
     }
+    static confirmDeliveredByCustomer = async (payload) => {
+        const {orderId} = payload;
+        const foundOrder = await getOrdersByUser({filter: {
+            _id: convertToObjectId(orderId)
+        }});
+        if (!foundOrder[0]) throw new BadRequestError("Order not found");
+        if (foundOrder[0].order_status == 'delivered') throw new BadRequestError("Order already confirm delivered");
+        if (foundOrder[0].order_status != 'shipped') throw new BadRequestError("You can't confirm it");
+        const order = await updateOrderById(orderId, {order_status: 'delivered'});
+        return order;
+    }
 }
 
 module.exports = OrderService;

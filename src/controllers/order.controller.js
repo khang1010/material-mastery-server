@@ -58,6 +58,12 @@ class OrderController {
             metadata: await OrderService.getOrdersByTimeRange(req.query)
         }).send(res);
     }
+    static confirmDeliveredByCustomer = async (req, res, next) => {
+        new OkResponse({
+            message: "Confirm delivered successfully",
+            metadata: await OrderService.confirmDeliveredByCustomer({orderId: req.params.id})
+        }).send(res);
+    }
 }
 
 module.exports = OrderController;
