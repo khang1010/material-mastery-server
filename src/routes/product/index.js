@@ -19,5 +19,6 @@ router.get('/unpublish/:id', asyncHandler(ProductController.unPublishProduct));
 router.post('/', asyncHandler(ProductController.create));
 router.patch('/:id', asyncHandler(ProductController.update));
 router.delete('/:id', asyncHandler(ProductController.deleteById));
+router.get('/draft', asyncHandler(ProductController.getAllDraft));
 
 module.exports = router;

@@ -34,6 +34,10 @@ class ProductService {
         return await getAllProductsByUser({...payload, filter: {isDraft: false}});
     }
 
+    static async getAllDraftProducts(payload) {
+        return await getAllProductsByUser({...payload, filter: {isDraft: true}});
+    }
+
     static async deleteProductById(id) {
         const product = await deleteProductById(id);
         if (await checkProductExists("STAFF", id, "STAFF-001")) {

@@ -18,6 +18,13 @@ class ProductController {
         }).send(res);
     }
 
+    static getAllDraft = async (req, res, next) => {
+        new OkResponse({
+            message: "Get products successfully",
+            metadata: await ProductService.getAllDraftProducts(req.query),
+        }).send(res);
+    }
+
     static deleteById = async (req, res, next) => {
         new OkResponse({
             message: "Delete product successfully",
