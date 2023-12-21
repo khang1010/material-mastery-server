@@ -46,6 +46,12 @@ class UserController {
             metadata: await UserFactory.getNumberOfManagers(),
         }).send(res);
     }
+    static getAllUsers = async (req, res, next) => {
+        new OkResponse({
+            message: "Get users successfully",
+            metadata: await UserFactory.getAllUsers(req.query, req.params.role),
+        }).send(res);
+    }
 }
 
 module.exports = UserController;

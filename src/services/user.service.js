@@ -1,7 +1,7 @@
 'use strict';
 
 const { BadRequestError, NotFoundError } = require('../core/error-response');
-const { updateUserById, findUserById } = require('../models/repositories/user');
+const { updateUserById, findUserById, getAllUsers } = require('../models/repositories/user');
 const { user, customer, staff, manager } = require('../models/user.model');
 const { removeUndefinedObject, updateNestedObject } = require('../utils');
 
@@ -55,6 +55,10 @@ class UserFactory {
   static async getNumberOfManagers() {
     const count = await manager.countDocuments();
     return count;
+  }
+
+  static async getAllUsers(payload, role) {
+    return await getAllUsers({...payload, filter: {roles: {$in: [role]}}});
   }
 }
 

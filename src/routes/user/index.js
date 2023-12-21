@@ -14,5 +14,6 @@ router.use(permission('manager'));
 router.get('/numbers/staffs', asyncHandler(UserController.getNumberOfStaffs));
 router.get('/numbers/managers', asyncHandler(UserController.getNumberOfManagers));
 router.get('/:user_id', asyncHandler(UserController.getUserByManager));
+router.get('/role/:role', asyncHandler(UserController.getAllUsers));
 
 module.exports = router;
