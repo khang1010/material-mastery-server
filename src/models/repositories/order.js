@@ -83,7 +83,9 @@ const getOrdersByUser = async ({limit = 50, page = 1, sorted = ["_id"], filter =
 }
 
 const updateOrderById = async (id, payload) => {
-  return await Order.findByIdAndUpdate(id, payload, { new: true });
+  // Order.updateMany({}, { $set: { order_exportId: '' }})
+  const order = await Order.findByIdAndUpdate(id, payload, { new: true });
+  return order;
 }
 
 const calculateOrdersByTimeRange = async (startTime, endTime, status) => {

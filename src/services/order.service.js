@@ -70,6 +70,13 @@ class OrderService {
     }
     static updateOrderStatusById = async (payload) => {
         const {orderId, status} = payload;
+        if (status == 'shipping') {
+            const {exportId = ""} = payload;
+            if (!exportId) throw new BadRequestError("Missing exportId");
+            const order = await updateOrderById(orderId, {order_status: status, order_exportId: exportId});
+            if (!order) throw new BadRequestError("Update order status failed");
+            return order;
+        }
         const order = await updateOrderById(orderId, {order_status: status});
         if (!order) throw new BadRequestError("Update order status failed");
         if (status == 'cancelled') {

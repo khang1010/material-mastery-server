@@ -14,6 +14,7 @@ var orderSchema = new mongoose.Schema({
     order_phone: {type: String, default: ''},
     order_date: {type: Date, default: Date.now},
     order_payment: {type: Object, default: {}},
+    order_exportId: {type: String, default: ''},
 }, {
     timestamps: true,
     collection: COLLECTION_NAME

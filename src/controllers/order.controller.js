@@ -31,7 +31,7 @@ class OrderController {
     static updateOrderStatusById = async (req, res, next) => {
         new OkResponse({
             message: "Update order status successfully",
-            metadata: await OrderService.updateOrderStatusById({orderId: req.params.id, status: req.query.status})
+            metadata: await OrderService.updateOrderStatusById({orderId: req.params.id, status: req.query.status, exportId: req.query.exportId})
         }).send(res);
     }
     static getNumberOfOrderByTimeRange = async (req, res, next) => {
