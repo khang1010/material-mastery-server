@@ -74,6 +74,7 @@ const calculateRevenueByYear = async () => {
 };
 
 const getOrdersByUser = async ({limit = 50, page = 1, sorted = ["_id"], filter = {}, unSelect = [], isAscending = true}) => {
+  // await Order.updateMany({}, { $set: { order_exportId: '' }})
   return await Order.find(filter)
   .skip((page - 1) * limit)
   .limit(limit)
@@ -83,7 +84,6 @@ const getOrdersByUser = async ({limit = 50, page = 1, sorted = ["_id"], filter =
 }
 
 const updateOrderById = async (id, payload) => {
-  // Order.updateMany({}, { $set: { order_exportId: '' }})
   const order = await Order.findByIdAndUpdate(id, payload, { new: true });
   return order;
 }
