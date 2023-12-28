@@ -8,7 +8,8 @@ const server = app.listen(port, () => {
 
 const io = require('socket.io')(server, {
     cors: {
-        origin: '*'
+        origin: true,
+        credentials: true
     }
 });
 global._io = io;
