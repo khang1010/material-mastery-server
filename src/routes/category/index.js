@@ -7,5 +7,6 @@ const router = express.Router();
 router.get('/', asyncHandler(CategoryController.getAll));
 router.post('/', asyncHandler(CategoryController.create));
 router.delete('/:category_id', asyncHandler(CategoryController.delete));
+router.patch('/:category_id', asyncHandler(CategoryController.update));
 
 module.exports = router;

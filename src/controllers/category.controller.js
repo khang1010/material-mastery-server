@@ -22,6 +22,12 @@ class CategoryController {
             metadata: await CategoryService.deleteCategory(req.params.category_id)
         }).send(res)
     }
+    static update = async (req, res, next) => {
+        new OkResponse({
+            message: "Update category successfully",
+            metadata: await CategoryService.updateCategory(req.params.category_id, req.body)
+        }).send(res)
+    }
 }
 
 module.exports = CategoryController;

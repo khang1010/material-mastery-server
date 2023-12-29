@@ -29,6 +29,10 @@ const getCategoryById = async (id, select) => {
     .lean();
 }
 
+const updateCategoryById = async (id, data) => {
+    return await categoryModel.findByIdAndUpdate(id, data, {new: true});
+}
+
 const getAllCategoriesByFilter = async ({limit = 50, page = 1, filter, select}) => {
     return await categoryModel.find(filter)
     .skip((page - 1) * limit)
@@ -44,4 +48,5 @@ module.exports = {
     findByName,
     getCategoryById,
     getAllCategoriesByFilter,
+    updateCategoryById,
 }
