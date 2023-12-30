@@ -40,8 +40,8 @@ class Database {
     // const notificationChangeStream = mongoose.connection.collection('notifications').watch();
     // notificationChangeStream.on('change', (change) => {
     //   if (change.operationType === 'insert' || change.operationType === 'update' || change.operationType === 'replace') {
-    //     console.log(">>>change: ", change.fullDocument);
-    //     io.emit('notificationChange', change.fullDocument);
+    //     console.log(">>>change: ", change.updateDescription);
+    //     _io.emit('notificationChange', change.updateDescription);
     //   }
     // });
 
