@@ -100,6 +100,13 @@ class DiscountService {
     static async getAllDiscountCodes(payload) {
         return await getAllDiscountCodesUnselect({...payload, filter: {}});
     }
+    static async getDiscountCodeById(payload) {
+        const {discount_id} = payload;
+        const foundDiscount = await getAllDiscountCodesUnselect({...payload, filter: {
+            _id: convertToObjectId(discount_id),
+        }});
+        return foundDiscount[0];
+    }
 }
 
 module.exports = DiscountService

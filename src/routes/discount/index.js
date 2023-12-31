@@ -9,6 +9,7 @@ router.get('/', asyncHandler(DiscountController.getDiscountsOfProduct));
 router.get('/products', asyncHandler(DiscountController.getProductsApplyDiscount));
 router.get('/all', asyncHandler(DiscountController.getAllDiscountCodes));
 router.post('/amount', asyncHandler(DiscountController.getDiscountAmount));
+router.get('/id/:id', asyncHandler(DiscountController.getDiscountCodeById));
 
 router.use(authentication)
 router.post('/cancel', asyncHandler(DiscountController.cancelDiscountCode));
