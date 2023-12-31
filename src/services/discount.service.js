@@ -8,8 +8,8 @@ const { convertToObjectId, removeUndefinedObject, updateNestedObject } = require
 class DiscountService {
     static async createDiscount(payload) {
         const {
-            name, description, code, value, max_uses, max_uses_per_user = -1, user_used, type, start_date, end_date, uses_count,
-            min_order_value, is_active, apply_to, products
+            name, description, code, value, max_uses, max_uses_per_user = -1, user_used = [], type, start_date, end_date, uses_count = 0,
+            min_order_value, is_active = true, apply_to, products
         } = payload;
         if (new Date(start_date) > new Date(end_date)) throw new BadRequestError('Start date must be before end date');
         const foundDiscount = await findDiscountByCode({ code });
