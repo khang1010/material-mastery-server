@@ -63,6 +63,14 @@ class DiscountController {
             })
         }).send(res);
     }
+    static getAllDiscountCodes = async (req, res, next) => {
+        new OkResponse({
+            message: "get discount codes successfully",
+            metadata: await DiscountService.getAllDiscountCodes({
+                ...req.query,
+            })
+        }).send(res);
+    }
 }
 
 module.exports = DiscountController

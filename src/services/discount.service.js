@@ -97,6 +97,9 @@ class DiscountService {
             ]
         }, limit, page, sorted, isAscending});
     }
+    static async getAllDiscountCodes(payload) {
+        return await getAllDiscountCodesUnselect({...payload, filter: {}});
+    }
 }
 
 module.exports = DiscountService
