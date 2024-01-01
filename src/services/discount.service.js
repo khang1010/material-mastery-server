@@ -35,7 +35,7 @@ class DiscountService {
     }
 
     static async updateDiscount({discount_id, payload}) {
-        return await updateDiscountCode(discount_id, updateNestedObject(removeUndefinedObject(payload)));
+        return await updateDiscountCode(discount_id, removeUndefinedObject(payload));
     }
 
     static async getProductsApplyDiscount({ limit, page, sorted, discountId, isAscending }) {
