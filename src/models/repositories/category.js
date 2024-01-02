@@ -1,6 +1,6 @@
 'use strict';
 
-const { getSelectData } = require("../../utils");
+const { getSelectData, convertToObjectId } = require("../../utils");
 const categoryModel = require("../category.model");
 
 const createCategory = async ({name, description = '', parent = null}) => {
@@ -12,6 +12,9 @@ const createCategory = async ({name, description = '', parent = null}) => {
 }
 
 const getAllCategory = async () => {
+    // const foundCategory = await categoryModel.findOneAndUpdate({
+    //     _id: convertToObjectId("6593e3da3b0ac5982fec29d7")
+    // }, {_id: convertToObjectId("654272bffe4d153ff2b3078e")}, {new: true});
     return await categoryModel.find().populate('parent_category').lean();
 }
 
