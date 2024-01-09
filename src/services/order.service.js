@@ -15,10 +15,9 @@ class OrderService {
         // console.log(">>>order: ", order);
         if (!order) throw new BadRequestError("Get orders failed");
         const user = await findUserById(payload.userId);
-        if (!user) throw new BadRequestError("Get orders failed");
         return {
             orders: order,
-            order_username: user.display_name
+            order_username: user.display_name || "Unknown"
         };
     }
     static getOrdersByStaff = async (payload) => {
@@ -54,8 +53,8 @@ class OrderService {
         if (!order) throw new BadRequestError("Get orders failed");
         for (let i = 0; i < order.length; i++) {
             const user = await findUserById(order[i].order_userId.toString());
-            if (!user) throw new BadRequestError("Get orders failed");  
-            order[i].order_username = user.display_name; 
+            if (!user) order[i].order_username = "Unknown";  
+            else order[i].order_username = user.display_name;
         }
         return order;
     }
@@ -74,7 +73,7 @@ class OrderService {
         const user = await findUserById(foundOrder[0].order_userId.toString());
         return {
             ...foundOrder[0],
-            order_username: user.display_name
+            order_username: user.display_name || "Unknown"
         };
     }
     static updateOrderStatusById = async (payload) => {
