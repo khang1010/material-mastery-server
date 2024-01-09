@@ -18,5 +18,6 @@ router.get('/payment/status', asyncHandler(OrderController.getOrdersByPaymentSta
 router.get('/staff', asyncHandler(OrderController.getOrdersByStaff));
 router.patch('/status/:id', asyncHandler(OrderController.updateOrderStatusById));
 router.get('/number', asyncHandler(OrderController.getNumberOfOrderByTimeRange));
+router.patch('/status/payment/:id', asyncHandler(OrderController.updateOrderPaymentStatus));
 
 module.exports = router;

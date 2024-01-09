@@ -64,6 +64,12 @@ class OrderController {
             metadata: await OrderService.confirmDeliveredByCustomer({orderId: req.params.id})
         }).send(res);
     }
+    static updateOrderPaymentStatus = async (req, res, next) => {
+        new OkResponse({
+            message: "Update order payment status successfully",
+            metadata: await OrderService.updateOrderPaymentStatus({id: req.params.id, status: req.query.status})
+        }).send(res);
+    }
 }
 
 module.exports = OrderController;

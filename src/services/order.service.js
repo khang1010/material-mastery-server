@@ -59,6 +59,14 @@ class OrderService {
         }
         return order;
     }
+    static updateOrderPaymentStatus = async (payload) => {
+        const {status, id} = payload;
+        const order = await updateOrderById(id, {order_payment: {
+            status: status || "pending"
+        }});
+        if (!order) throw new BadRequestError("Update order failed");
+        return order;
+    }
     static getOrderById = async (id) => {
         const foundOrder = await getOrdersByUser({filter: {
             _id: convertToObjectId(id)
