@@ -78,7 +78,7 @@ class ProductController {
     static searchProductsByUser = async (req, res, next) => {
         new OkResponse({
             message: "Search products successfully",
-            metadata: await ProductService.searchProductsByUser({keySearch: req.query.keySearch}),
+            metadata: await ProductService.searchProductsByUser({...req.query}),
         }).send(res);
     }
     static getSellingProducts = async (req, res, next) => {

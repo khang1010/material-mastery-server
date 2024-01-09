@@ -116,10 +116,10 @@ const getNumberOfProductsByCategory = async (category, isDraft) => {
     return totalProducts.length ? totalProducts[0].totalBills : 0;
 }
 
-const searchProductsByUser = async ({keySearch}) => {
+const searchProductsByUser = async ({keySearch, isDraft = false}) => {
     const regexSearch = new RegExp(keySearch);
     return await product.find({
-        isDraft: false,
+        isDraft: isDraft || false,
         $text: {
             $search: regexSearch
         },

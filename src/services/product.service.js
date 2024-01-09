@@ -134,8 +134,8 @@ class ProductService {
             published: await getNumberOfProductsByCategory(category, false),
         }
     }
-    static async searchProductsByUser({ keySearch }) {
-        return await searchProductsByUser({ keySearch });
+    static async searchProductsByUser({ keySearch, isDraft = false }) {
+        return await searchProductsByUser({ keySearch, isDraft });
     }
     static async getSellingProducts(payload) {
         const products = await getAllProductsByUser({...payload, filter: {
