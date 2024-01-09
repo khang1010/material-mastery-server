@@ -23,20 +23,21 @@ class OrderService {
     }
     static getOrdersByStaff = async (payload) => {
         const {status} = payload;
-        // console.log(">>>status: ", status);
         let order = [];
-        if (!status) {
+        
+        if (status == undefined) {
             order = await getOrdersByUser({...payload, unSelect: ["__v"]});
         } else {
             order = await getOrdersByUser({...payload, unSelect: ["__v"], filter: {
                 order_status: status
             }});
+            console.log(">>>status: ", order);
         }
-        if (!order) throw new BadRequestError("Get orders failed");
+        // if (order == []) throw new BadRequestError("Get orders failed");
         for (let i = 0; i < order.length; i++) {
             const user = await findUserById(order[i].order_userId.toString());
-            if (!user) throw new BadRequestError("Get orders failed");  
-            order[i].order_username = user.display_name; 
+            if (!user) order[i].order_username = "Unknown";  
+            else order[i].order_username = user.display_name;
         }
         return order;
     }
