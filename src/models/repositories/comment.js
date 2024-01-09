@@ -71,7 +71,8 @@ const getCommentByParentId = async ({
         
         for (const comment of comments) {
             const foundUser = await findUserById(comment.comment_userId);
-            comment.user_avatar = foundUser.avatar;
+            if (!foundUser) comment.user_avatar = "";
+            else comment.user_avatar = foundUser.avatar;
         }
         
         return comments;
@@ -87,7 +88,8 @@ const getCommentByParentId = async ({
     }).lean();
     for (const comment of comments) {
         const foundUser = await findUserById(comment.comment_userId);
-        comment.user_avatar = foundUser.avatar;
+        if (!foundUser) comment.user_avatar = "";
+        else comment.user_avatar = foundUser.avatar;
     }
     // console.log(">>>comments: ", comments)
     return comments;
