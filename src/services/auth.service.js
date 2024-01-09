@@ -7,7 +7,7 @@ const { user } = require('../models/user.model');
 // const twilio = require('twilio');
 const GOOGLE_MAILER_CLIENT_ID = '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com'
 const GOOGLE_MAILER_CLIENT_SECRET = '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'
-const GOOGLE_MAILER_REFRESH_TOKEN = '1//04P7SNn2EbAkcCgYIARAAGAQSNwF-L9IrxqmRyjYWYjFf72u-pQL5kkJ_-3rhxrOiQYROTeFlZ17G40mkImD5ZYDbgCiRTKE_8T0'
+const GOOGLE_MAILER_REFRESH_TOKEN = '1//04MSDCr80IWNCCgYIARAAGAQSNwF-L9IrlqjSA-NwyoTzxh8EN4JXqUTsIENO0WW3OvDV4K3j-CZ46RommLwR5gqrdr_1fgHY77g'
 const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com'
 
 const myOAuth2Client = new OAuth2Client(
