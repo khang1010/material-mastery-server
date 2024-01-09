@@ -14,7 +14,7 @@ class OrderService {
         }, unSelect: ["order_userId", "__v"]});
         // console.log(">>>order: ", order);
         if (!order) throw new BadRequestError("Get orders failed");
-        const user = await findUserById(payload.userId);
+        const user = await findUserById(payload.userId || "");
         return {
             orders: order,
             order_username: user.display_name || "Unknown"
@@ -34,7 +34,7 @@ class OrderService {
         }
         // if (order == []) throw new BadRequestError("Get orders failed");
         for (let i = 0; i < order.length; i++) {
-            const user = await findUserById(order[i].order_userId.toString());
+            const user = await findUserById(order[i].order_userId.toString() || "");
             if (!user) order[i].order_username = "Unknown";  
             else order[i].order_username = user.display_name;
         }
@@ -52,7 +52,7 @@ class OrderService {
         }
         if (!order) throw new BadRequestError("Get orders failed");
         for (let i = 0; i < order.length; i++) {
-            const user = await findUserById(order[i].order_userId.toString());
+            const user = await findUserById(order[i].order_userId.toString() || "");
             if (!user) order[i].order_username = "Unknown";  
             else order[i].order_username = user.display_name;
         }
@@ -70,7 +70,7 @@ class OrderService {
         const foundOrder = await getOrdersByUser({filter: {
             _id: convertToObjectId(id)
         }, unSelect: ["__v"]});
-        const user = await findUserById(foundOrder[0].order_userId.toString());
+        const user = await findUserById(foundOrder[0].order_userId.toString() || "");
         return {
             ...foundOrder[0],
             order_username: user.display_name || "Unknown"
