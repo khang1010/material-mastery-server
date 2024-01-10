@@ -3,7 +3,7 @@ const moment = require('moment-timezone');
 const { BadRequestError } = require("../core/error-response");
 const { updateInventoryStock, pullReservationInventory } = require("../models/repositories/inventory");
 const { getOrdersByUser, updateOrderById, calculateOrdersByTimeRange, getNumberOfOrdersByCustomer } = require("../models/repositories/order");
-const { convertToObjectId } = require("../utils");
+const { convertToObjectId, updateNestedObject } = require("../utils");
 const ProductService = require("./product.service");
 const { findUserById } = require('../models/repositories/user');
 
@@ -60,9 +60,9 @@ class OrderService {
     }
     static updateOrderPaymentStatus = async (payload) => {
         const {status, id} = payload;
-        const order = await updateOrderById(id, {order_payment: {
+        const order = await updateOrderById(id, updateNestedObject({order_payment: {
             status: status || "pending"
-        }});
+        }}));
         if (!order) throw new BadRequestError("Update order failed");
         return order;
     }
