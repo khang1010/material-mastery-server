@@ -7,7 +7,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 const swaggerDocument = require('./utils/swagger');
 const redisClient = require('./dbs/init-redis');
-const cors = require('cors');
+const cors = require('cors')
 const SocketService = require('./services/socket.service');
 require('dotenv').config();
 require('./helpers/billCleanup');
