@@ -31,7 +31,7 @@ jobs:
           REDIS_PORT: ${{secrets.REDIS_PORT}}
           REDIS_PASSWORD: ${{secrets.REDIS_PASSWORD}}
         run: |
-          ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-3-25-253-64.ap-southeast-2.compute.amazonaws.com "
+          ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-54-206-15-60.ap-southeast-2.compute.amazonaws.com "
           rm -rf material-mastery-server &&
           git clone https://github.com/khang1010/material-mastery-server.git &&
           cd material-mastery-server && 
