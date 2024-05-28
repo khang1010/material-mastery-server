@@ -8,11 +8,11 @@ class RedisClient {
 
   async createClient() {
     this.client = new Redis({
-      // host: process.env.REDIS_HOST || 'localhost',
-      // port: process.env.REDIS_PORT || 6379,
-      // password: process.env.REDIS_PASSWORD,
-      host: 'localhost',
-      port: 6379,
+      host: process.env.REDIS_HOST || 'localhost',
+      port: process.env.REDIS_PORT || 6379,
+      password: process.env.REDIS_PASSWORD,
+      // host: 'localhost',
+      // port: 6379,
     })
 
     this.client.on('connect', () => {
