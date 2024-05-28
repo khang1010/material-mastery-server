@@ -1,5 +1,4 @@
 const { StatusCodes, ReasonPhrases } = require('../utils/httpStatusCode')
-const winstonLogger = require('./winston.logger.js')
 
 class SuccessResponse {
   constructor({
@@ -15,12 +14,6 @@ class SuccessResponse {
   }
 
   send(res, headers = {}) {
-    console.log('oke')
-    winstonLogger.log(`response::${this.message}`, {
-      context: req.path,
-      requestId: req.requestId,
-      metadata: this.metadata,
-    })
     return res.status(this.statusCode).json(this)
   }
 }
