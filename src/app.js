@@ -34,11 +34,12 @@ instanceMongoDb
 
 app.use((req, res, next) => {
   const requestId = req.headers['x-request-id']
+
   req.requestId = requestId ? requestId : uuid4()
   logger.log('input params', {
     context: req.path,
     requestId: req.requestId,
-    metadata: req.method === 'post' ? req.body : req.query,
+    metadata: req.method === 'POST' ? req.body : req.query,
   })
   next()
 })
@@ -57,7 +58,7 @@ app.use((error, req, res, next) => {
   logger.error(error.message, {
     context: req.path,
     requestId: req.requestId,
-    metadata: req.method === 'post' ? req.body : req.query,
+    metadata: req.method === 'POST' ? req.body : req.query,
   })
   const statusCode = error.status || 500
   return res.status(statusCode).json({
