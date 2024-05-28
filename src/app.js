@@ -10,7 +10,7 @@ const redisClient = require('./dbs/init-redis')
 const cors = require('cors')
 const SocketService = require('./services/socket.service')
 const { v4: uuid4 } = require('uuid')
-const winstonLogger = require('./core/winston.logger')
+const logger = require('./core/logger')
 require('dotenv').config()
 require('./helpers/billCleanup')
 const app = express()
@@ -35,7 +35,7 @@ instanceMongoDb
 app.use((req, res, next) => {
   const requestId = req.headers['x-request-id']
   req.requestId = requestId ? requestId : uuid4()
-  winstonLogger.log('input params', {
+  logger.log('input params', {
     context: req.path,
     requestId: req.requestId,
     metadata: req.method === 'post' ? req.body : req.query,
@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 })
 
 app.use((error, req, res, next) => {
-  winstonLogger.error(error.message, {
+  logger.error(error.message, {
     context: req.path,
     requestId: req.requestId,
     metadata: req.method === 'post' ? req.body : req.query,

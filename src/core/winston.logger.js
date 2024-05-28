@@ -1,6 +1,5 @@
 const winston = require('winston')
 require('winston-daily-rotate-file')
-
 class WinstonLogger {
   static getInstance() {
     if (!this.instance) {
