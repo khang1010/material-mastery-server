@@ -5,58 +5,60 @@ const { OAuth2Client } = require('google-auth-library');
 const { BadRequestError } = require('../core/error-response');
 const { user } = require('../models/user.model');
 // const twilio = require('twilio');
-const GOOGLE_MAILER_CLIENT_ID = '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com'
-const GOOGLE_MAILER_CLIENT_SECRET = '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'
-const GOOGLE_MAILER_REFRESH_TOKEN = '1//041z1Kqodu2gyCgYIARAAGAQSNwF-L9Ir9VJSS5rqZiWNJt5no8cO7-AhgjblQiCA-cy1-NvUUZvmrA6F8_MCVLKtP66mKhGiXEU'
-const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com'
+const GOOGLE_MAILER_CLIENT_ID =
+  '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com';
+const GOOGLE_MAILER_CLIENT_SECRET = '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';
+const GOOGLE_MAILER_REFRESH_TOKEN =
+  '1//043pVTd4hrrh8CgYIARAAGAQSNwF-L9IrtzlkKlMyBuTe7R4pjAHimZ5WyyQPGdVsy2z-lThBoQS7VKSwrur-M7-b48FiBb3OIB8';
+const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com';
 
 const myOAuth2Client = new OAuth2Client(
-    GOOGLE_MAILER_CLIENT_ID,
-    GOOGLE_MAILER_CLIENT_SECRET
-)
+  GOOGLE_MAILER_CLIENT_ID,
+  GOOGLE_MAILER_CLIENT_SECRET
+);
 myOAuth2Client.setCredentials({
-    refresh_token: GOOGLE_MAILER_REFRESH_TOKEN
-})
+  refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+});
 
 // function formatPhoneNumber(phoneNumber) {
 //     const cleaned = phoneNumber.replace(/\D/g, '');
 //     if (cleaned.startsWith('0')) {
 //       return `+84${cleaned.slice(1)}`;
 //     }
-  
+
 //     return cleaned;
 // }
 class AuthService {
-    static generateVerificationCode = () => {
-        const codeLength = 6;
-        const min = Math.pow(10, codeLength - 1);
-        const max = Math.pow(10, codeLength) - 1;
-        const verificationCode = Math.floor(Math.random() * (max - min + 1)) + min;
-        return verificationCode.toString();
-    }
-    static sendVerificationEmail = async (email) => {
-        const foundUser = await user.findOne({ email }).lean();
-        if (foundUser) throw new BadRequestError('Email already exists');
-        try {
-            const myAccessTokenObject = await myOAuth2Client.getAccessToken()
-            const myAccessToken = myAccessTokenObject?.token
-            const transport = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                  type: 'OAuth2',
-                  user: ADMIN_EMAIL_ADDRESS,
-                  clientId: GOOGLE_MAILER_CLIENT_ID,
-                  clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
-                  refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
-                  accessToken: myAccessToken
-                }
-            })
-            const code = await AuthService.saveVerificationToken(email);
-            const mailOptions = {
-                from: "Material Mastery",
-                to: email,
-                subject: 'Email Verification',
-                html: `
+  static generateVerificationCode = () => {
+    const codeLength = 6;
+    const min = Math.pow(10, codeLength - 1);
+    const max = Math.pow(10, codeLength) - 1;
+    const verificationCode = Math.floor(Math.random() * (max - min + 1)) + min;
+    return verificationCode.toString();
+  };
+  static sendVerificationEmail = async (email) => {
+    const foundUser = await user.findOne({ email }).lean();
+    if (foundUser) throw new BadRequestError('Email already exists');
+    try {
+      const myAccessTokenObject = await myOAuth2Client.getAccessToken();
+      const myAccessToken = myAccessTokenObject?.token;
+      const transport = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: ADMIN_EMAIL_ADDRESS,
+          clientId: GOOGLE_MAILER_CLIENT_ID,
+          clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
+          refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+          accessToken: myAccessToken,
+        },
+      });
+      const code = await AuthService.saveVerificationToken(email);
+      const mailOptions = {
+        from: 'Material Mastery',
+        to: email,
+        subject: 'Email Verification',
+        html: `
                 <html lang="en">
                 <head>
                   <meta charset="UTF-8">
@@ -121,47 +123,47 @@ class AuthService {
                   </div>
                 </body>
               </html>
-                `
-            };
-    
-            const info = await transport.sendMail(mailOptions);
-            console.log(`Email sent: ${info.response}`);
-            return email;
-        } catch (error) {
-            console.log(`Error: ${error}`);
-            throw new BadRequestError("Error sending verification email");
-        }
+                `,
+      };
+
+      const info = await transport.sendMail(mailOptions);
+      console.log(`Email sent: ${info.response}`);
+      return email;
+    } catch (error) {
+      console.log(`Error: ${error}`);
+      throw new BadRequestError('Error sending verification email');
     }
+  };
 
-    static saveVerificationToken = async (email) => {
-        const token = AuthService.generateVerificationCode();
-        await redisClient.set(`verification:${token}`, email);
-        await redisClient.expire(`verification:${token}`, 300); // Hết hạn sau 5 phút
-        return token;
-    }
+  static saveVerificationToken = async (email) => {
+    const token = AuthService.generateVerificationCode();
+    await redisClient.set(`verification:${token}`, email);
+    await redisClient.expire(`verification:${token}`, 300); // Hết hạn sau 5 phút
+    return token;
+  };
 
-    static verifyEmailCode = async (code) => {
-        const foundEmail = await redisClient.get(`verification:${code}`);
-        if (!foundEmail) throw new BadRequestError("Invalid verification code");
-        await redisClient.del(`verification:${code}`);
-        return foundEmail;
-    }
+  static verifyEmailCode = async (code) => {
+    const foundEmail = await redisClient.get(`verification:${code}`);
+    if (!foundEmail) throw new BadRequestError('Invalid verification code');
+    await redisClient.del(`verification:${code}`);
+    return foundEmail;
+  };
 
-    // static sendVerificationSMS = async (phone) => {
-    //     try {
-    //         const code = await AuthService.saveVerificationToken(phone);
-    //         await twilioClient.messages.create({
-    //             body: `Your verification code is: ${code}`,
-    //             from: formatPhoneNumber('0387411702'),
-    //             to: formatPhoneNumber(phone),
-    //         });
+  // static sendVerificationSMS = async (phone) => {
+  //     try {
+  //         const code = await AuthService.saveVerificationToken(phone);
+  //         await twilioClient.messages.create({
+  //             body: `Your verification code is: ${code}`,
+  //             from: formatPhoneNumber('0387411702'),
+  //             to: formatPhoneNumber(phone),
+  //         });
 
-    //         return phone;
-    //     } catch (error) {
-    //         console.log(`Error: ${error}`);
-    //         throw new BadRequestError("Error sending verification SMS");
-    //     }
-    // }
+  //         return phone;
+  //     } catch (error) {
+  //         console.log(`Error: ${error}`);
+  //         throw new BadRequestError("Error sending verification SMS");
+  //     }
+  // }
 }
 
 module.exports = AuthService;
