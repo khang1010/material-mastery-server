@@ -13,7 +13,7 @@ class RedisClient {
       password: process.env.REDIS_PASSWORD,
       // host: 'localhost',
       // port: 6379,
-    })
+    }) 
 
     this.client.on('connect', () => {
       console.log('Connected to Redis')
