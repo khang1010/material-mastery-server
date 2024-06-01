@@ -30,6 +30,21 @@ app.use(
 // init database
 instanceMongoDb;
 
+const client = require('prom-client');
+const collectDefaultMetrics = client.collectDefaultMetrics;
+const Registry = client.Registry;
+const register = new Registry();
+collectDefaultMetrics({ register });
+
+app.get('/metrics', async (_req, res) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (err) {
+    res.status(500).end(err);
+  }
+});
+
 // init routes
 app.use('/', require('./routes/index'));
 
