@@ -38,8 +38,7 @@ jobs:
           git clone https://github.com/khang1010/material-mastery-server.git &&
           cd material-mastery-server && 
           echo $'DISCORD_TOKEN=${{secrets.DISCORD_TOKEN}}\nDISCORD_CHANNEL=${{secrets.DISCORD_CHANNEL}}\nPORT=${{secrets.PORT}}\nNODE_ENV=${{secrets.NODE_ENV}}\nDEV_APP_PORT=${{secrets.DEV_APP_PORT}}\nDEV_DB_HOST=${{secrets.DEV_DB_HOST}}\nDEV_DB_NAME=${{secrets.DEV_DB_NAME}}\nDEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}\nDEV_DB_PORT=${{secrets.DEV_DB_PORT}}\nREDIS_HOST=${{secrets.REDIS_HOST}}\nREDIS_PORT=${{secrets.REDIS_PORT}}\nREDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}' > .env &&
-          sudo docker stop $(docker ps -a -q) &&
-          docker rm $(docker ps -a -q) &&
+          sudo docker rm -f server &&
           sudo docker-compose down &&
           sudo docker-compose up --build -d &&
           sudo docker image prune -f &&
