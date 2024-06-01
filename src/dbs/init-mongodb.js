@@ -28,25 +28,6 @@ class Database {
       .catch((error) =>
         console.log(`Failed to connect to MongoDB with error: ${error}`)
       );
-
-    // Add Socket.IO logic for broadcasting changes
-    // const httpServer = http.createServer();
-    // const io = new Server(httpServer);
-
-    // io.on('connection', (socket) => {
-    //   console.log('A user connected');
-    // });
-
-    // const notificationChangeStream = mongoose.connection.collection('notifications').watch();
-    // notificationChangeStream.on('change', (change) => {
-    //   if (change.operationType === 'insert' || change.operationType === 'update' || change.operationType === 'replace') {
-    //     console.log(">>>change: ", change.updateDescription);
-    //     _io.emit('notificationChange', change.updateDescription);
-    //   }
-    // });
-
-    // this.io = io;
-    // this.httpServer = httpServer;
   }
 
   static getInstance() {
