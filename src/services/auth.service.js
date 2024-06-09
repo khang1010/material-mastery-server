@@ -9,7 +9,7 @@ const GOOGLE_MAILER_CLIENT_ID =
   '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com';
 const GOOGLE_MAILER_CLIENT_SECRET = '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';
 const GOOGLE_MAILER_REFRESH_TOKEN =
-  '1//043pVTd4hrrh8CgYIARAAGAQSNwF-L9IrtzlkKlMyBuTe7R4pjAHimZ5WyyQPGdVsy2z-lThBoQS7VKSwrur-M7-b48FiBb3OIB8';
+  '1//04shaDpWO0sHMCgYIARAAGAQSNwF-L9IrVFzdDTO2lrkbg9Tx5rB6Nv0DQi8tnZyY5PFtmkD0SVAiuvrGrEbs8zkoiMLcgh-VWyk';
 const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com';
 
 const myOAuth2Client = new OAuth2Client(

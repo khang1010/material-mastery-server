@@ -33,7 +33,7 @@ jobs:
           DISCORD_TOKEN: ${{secrets.DISCORD_TOKEN}}
           DISCORD_CHANNEL: ${{secrets.DISCORD_CHANNEL}}
         run: |
-          ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-3-26-179-89.ap-southeast-2.compute.amazonaws.com "
+          ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-3-104-37-153.ap-southeast-2.compute.amazonaws.com "
           rm -rf material-mastery-server &&
           git clone https://github.com/khang1010/material-mastery-server.git &&
           cd material-mastery-server && 
