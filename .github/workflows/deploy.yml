@@ -1,9 +1,52 @@
+# name: Deploy
+
+# on:
+#   push:
+#     branches: ['master']
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Add key.pem
+#         run: echo "${{ secrets.SSH_KEY }}" > "key.pem"
+#       - name: Change mode
+#         run: chmod 400 "key.pem"
+#       - name: SSH
+#         env:
+#           PORT: ${{secrets.PORT}}
+#           NODE_ENV: ${{secrets.NODE_ENV}}
+#           DEV_APP_PORT: ${{secrets.DEV_APP_PORT}}
+#           DEV_DB_HOST: ${{secrets.DEV_DB_HOST}}
+#           DEV_DB_NAME: ${{secrets.DEV_DB_NAME}}
+#           DEV_DB_PASSWORD: ${{secrets.DEV_DB_PASSWORD}}
+#           DEV_DB_PORT: ${{secrets.DEV_DB_PORT}}
+#           PRO_APP_PORT: ${{secrets.PRO_APP_PORT}}
+#           PRO_DB_HOST: ${{secrets.PRO_DB_HOST}}
+#           PRO_DB_NAME: ${{secrets.PRO_DB_NAME}}
+#           PRO_DB_PORT: ${{secrets.PRO_DB_PORT}}
+#           REDIS_HOST: ${{secrets.REDIS_HOST}}
+#           REDIS_PORT: ${{secrets.REDIS_PORT}}
+#           REDIS_PASSWORD: ${{secrets.REDIS_PASSWORD}}
+#           DISCORD_TOKEN: ${{secrets.DISCORD_TOKEN}}
+#           DISCORD_CHANNEL: ${{secrets.DISCORD_CHANNEL}}
+#         run: |
+#           ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-3-26-115-120.ap-southeast-2.compute.amazonaws.com "
+#           rm -rf material-mastery-server &&
+#           git clone https://github.com/khang1010/material-mastery-server.git &&
+#           cd material-mastery-server && 
+#           echo $'DISCORD_TOKEN=${{secrets.DISCORD_TOKEN}}\nDISCORD_CHANNEL=${{secrets.DISCORD_CHANNEL}}\nPORT=${{secrets.PORT}}\nNODE_ENV=${{secrets.NODE_ENV}}\nDEV_APP_PORT=${{secrets.DEV_APP_PORT}}\nDEV_DB_HOST=${{secrets.DEV_DB_HOST}}\nDEV_DB_NAME=${{secrets.DEV_DB_NAME}}\nDEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}\nDEV_DB_PORT=${{secrets.DEV_DB_PORT}}\nREDIS_HOST=${{secrets.REDIS_HOST}}\nREDIS_PORT=${{secrets.REDIS_PORT}}\nREDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}' > .env &&
+#           sudo docker-compose down &&
+#           sudo docker-compose up --build -d &&
+#           sudo docker image prune -f &&
+#           exit
+#           "
+
+
 name: Deploy
 
 on:
   push:
-    branches: ['master', 'config_docker']
-  pull_request:
     branches: ['master']
 
 jobs:
@@ -12,9 +55,15 @@ jobs:
     steps:
       - name: Add key.pem
         run: echo "${{ secrets.SSH_KEY }}" > "key.pem"
+
       - name: Change mode
         run: chmod 400 "key.pem"
-      - name: SSH
+
+      - name: Update .env file
+        run: |
+          echo "NODE_ENV=production" >> .env
+
+      - name: SSH into EC2 and deploy
         env:
           PORT: ${{secrets.PORT}}
           NODE_ENV: ${{secrets.NODE_ENV}}
@@ -33,13 +82,22 @@ jobs:
           DISCORD_TOKEN: ${{secrets.DISCORD_TOKEN}}
           DISCORD_CHANNEL: ${{secrets.DISCORD_CHANNEL}}
         run: |
-          ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@ec2-3-26-115-120.ap-southeast-2.compute.amazonaws.com "
-          rm -rf material-mastery-server &&
-          git clone https://github.com/khang1010/material-mastery-server.git &&
-          cd material-mastery-server && 
-          echo $'DISCORD_TOKEN=${{secrets.DISCORD_TOKEN}}\nDISCORD_CHANNEL=${{secrets.DISCORD_CHANNEL}}\nPORT=${{secrets.PORT}}\nNODE_ENV=${{secrets.NODE_ENV}}\nDEV_APP_PORT=${{secrets.DEV_APP_PORT}}\nDEV_DB_HOST=${{secrets.DEV_DB_HOST}}\nDEV_DB_NAME=${{secrets.DEV_DB_NAME}}\nDEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}\nDEV_DB_PORT=${{secrets.DEV_DB_PORT}}\nREDIS_HOST=${{secrets.REDIS_HOST}}\nREDIS_PORT=${{secrets.REDIS_PORT}}\nREDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}' > .env &&
-          sudo docker-compose down &&
-          sudo docker-compose up --build -d &&
-          sudo docker image prune -f &&
-          exit
-          "
+          ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@13.250.15.175 << 'EOF'
+            set -e
+            cd home/material-mastery-server/
+            echo $'DISTANCE_MATRIX_API_KEY=${{secrets.DISTANCE_MATRIX_API_KEY}}\nDISCORD_TOKEN=${{secrets.DISCORD_TOKEN}}\nDISCORD_CHANNEL=${{secrets.DISCORD_CHANNEL}}\nPORT=${{secrets.PORT}}\nNODE_ENV=${{secrets.NODE_ENV}}\nDEV_APP_PORT=${{secrets.DEV_APP_PORT}}\nDEV_DB_HOST=${{secrets.DEV_DB_HOST}}\nDEV_DB_NAME=${{secrets.DEV_DB_NAME}}\nDEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}\nDEV_DB_PORT=${{secrets.DEV_DB_PORT}}\nREDIS_HOST=${{secrets.REDIS_HOST}}\nREDIS_PORT=${{secrets.REDIS_PORT}}\nREDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}' > .env &&
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git config --global user.name 'github-actions[bot]'
+            git checkout -- deployment/production/nginx-conf/nginx.conf
+            git checkout master
+            git pull origin master
+            bash deployment/production/scripts/safe-compose-up.sh &&
+            sudo docker image prune -f &&
+            sudo docker system prune -f &&
+            exit
+          EOF
+
+      - name: Cleanup key
+        if: always()
+        run: |
+          rm key.pem
