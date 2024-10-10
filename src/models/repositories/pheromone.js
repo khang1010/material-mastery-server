@@ -35,7 +35,7 @@ async function initializePheromones(locations) {
             fromLocation,
             toLocation,
             pheromone: 1.0, // Giá trị ban đầu của pheromone
-            heuristic: 1 / distance, // Heuristic tính dựa trên khoảng cách
+            heuristic: 1 / (distance / 1000), // Heuristic tính dựa trên khoảng cách
             distance, // Khoảng cách thực tế
             evaporationRate: 0.05, // Tốc độ bay hơi
           });
@@ -50,6 +50,7 @@ async function initializePheromones(locations) {
 
 async function updatePheromone(route, rating) {
   const pheromoneChange = (rating / 5) * 0.1; // Cập nhật dựa trên đánh giá (0 - 5 sao)
+  const result = [];
 
   for (let i = 0; i < route.length - 1; i++) {
     const fromLocation = route[i];
@@ -73,8 +74,10 @@ async function updatePheromone(route, rating) {
 
       // Lưu lại pheromone mới vào cơ sở dữ liệu
       await pheromoneRecord.save();
+      result.push(pheromoneRecord);
     }
   }
+  return result;
 }
 
 function selectNextLocation(currentLocation, unvisitedLocations, pheromones) {
@@ -122,8 +125,8 @@ async function createPheromone(data) {
   return await pheromoneModel.create(data);
 }
 
-async function updatePheromone(fromLocation, toLocation, pheromoneData) {
-  return await Pheromone.findOneAndUpdate(
+async function updatePheromoneData(fromLocation, toLocation, pheromoneData) {
+  return await pheromoneModel.findOneAndUpdate(
     { fromLocation, toLocation },
     { $set: pheromoneData, lastUpdated: Date.now() },
     { new: true }
@@ -139,7 +142,7 @@ module.exports = {
   updatePheromone,
   selectNextLocation,
   getAllPheromones,
-  updatePheromone,
+  updatePheromoneData,
   getPheromone,
   createPheromone,
 };
