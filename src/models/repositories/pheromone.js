@@ -35,7 +35,7 @@ async function initializePheromones(locations) {
             fromLocation,
             toLocation,
             pheromone: 1.0, // Giá trị ban đầu của pheromone
-            heuristic: 1 / (distance / 1000), // Heuristic tính dựa trên khoảng cách
+            heuristic: calculateHeuristic(distance), // Heuristic tính dựa trên khoảng cách
             distance, // Khoảng cách thực tế
             evaporationRate: 0.05, // Tốc độ bay hơi
           });
@@ -137,6 +137,58 @@ async function getAllPheromones() {
   return await Pheromone.find({});
 }
 
+function localPheromoneUpdate(
+  pheromones,
+  currentLocation,
+  nextLocation,
+  evaporationRate
+) {
+  const key = `${currentLocation}-${nextLocation}`;
+  if (pheromones[key]) {
+    pheromones[key].pheromone =
+      (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1; // Thêm pheromone mới
+  }
+}
+
+function globalPheromoneUpdate(route, pheromones, bestRoute, evaporationRate) {
+  route.forEach((location, index) => {
+    if (index < route.length - 1) {
+      const currentLocation = location;
+      const nextLocation = route[index + 1];
+      const key = `${currentLocation}-${nextLocation}`;
+
+      // Nếu tuyến đường này nằm trong bestRoute, ta thêm pheromone mạnh hơn
+      if (pheromones[key]) {
+        pheromones[key].pheromone =
+          (1 - evaporationRate) * pheromones[key].pheromone +
+          evaporationRate * (bestRoute ? 2 : 1); // Nếu là bestRoute thì cộng nhiều hơn
+      }
+    }
+  });
+}
+
+function calculateRouteRating(route) {
+  let totalRating = 0;
+  for (let i = 0; i < route.length - 1; i++) {
+    const fromLocation = route[i];
+    const toLocation = route[i + 1];
+
+    const pheromoneRecord = pheromoneModel.findOne({
+      fromLocation,
+      toLocation,
+    });
+
+    if (pheromoneRecord) {
+      totalRating += pheromoneRecord.rating;
+    }
+  }
+  return totalRating / (route.length - 1);
+}
+
+function calculateHeuristic(distance, scalingFactor = 100) {
+  return 1 / (distance + scalingFactor); // Tỷ lệ heuristic dựa trên khoảng cách và yếu tố điều chỉnh
+}
+
 module.exports = {
   initializePheromones,
   updatePheromone,
@@ -145,4 +197,8 @@ module.exports = {
   updatePheromoneData,
   getPheromone,
   createPheromone,
+  localPheromoneUpdate,
+  globalPheromoneUpdate,
+  calculateRouteRating,
+  calculateHeuristic,
 };
