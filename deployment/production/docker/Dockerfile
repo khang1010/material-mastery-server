@@ -37,30 +37,27 @@ ENV DISCORD_TOKEN=${DISCORD_TOKEN}
 ENV DISCORD_CHANNEL=${DISCORD_CHANNEL}
 ENV DISTANCE_MATRIX_API_KEY=${DISTANCE_MATRIX_API_KEY}
 
-# Set the working directory
+# Set the working directory and copy files
 WORKDIR /app
-
-# Copy all files and install dependencies
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the application files
+# Copy the rest of the application files and set ownership for node user
 COPY . .
+RUN chown -R node:node /app
 
 # Stage 2: Runtime
 FROM --platform=linux/amd64 node:20.14.0-alpine
 
-# Environment variable for runtime
+# Set environment for runtime and use non-root user
 ENV NODE_ENV production
-
-# Set up a non-root user and appropriate permissions
 USER node
 WORKDIR /home/node/app
 
 # Copy only necessary files from the build stage
 COPY --from=build /app ./
-
-RUN npm ci
 
 HEALTHCHECK --interval=30s \
             --timeout=5s \
