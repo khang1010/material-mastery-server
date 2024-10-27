@@ -89,7 +89,7 @@ while true; do
         echo "✅ Health check is healthy."
 
         echo "Replacing Nginx Configure..." 
-        sudo sed -i "s/server/$DESIRE_CONTAINER/g" deployment/production/nginx-conf/nginx.conf
+        sudo sed -i "s/docker-server-1/$DESIRE_CONTAINER/g" deployment/production/nginx-conf/nginx.conf
         echo "🔄 Reloading Nginx config..."
         sudo docker exec webnginx sh -c "nginx -s reload"
 
