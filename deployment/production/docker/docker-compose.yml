@@ -34,6 +34,8 @@ services:
     volumes:
       - ../nginx-conf:/etc/nginx/conf.d
       - web-root:/var/www/html
+    depends_on:
+      - server
     networks:
       - app-network
 
