@@ -51,6 +51,9 @@ RUN chown -R node:node /app
 # Stage 2: Runtime
 FROM --platform=linux/amd64 node:20.14.0-alpine
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Set environment for runtime and use non-root user
 ENV NODE_ENV production
 USER node
