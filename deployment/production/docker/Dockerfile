@@ -62,8 +62,10 @@ WORKDIR /home/node/app
 # Copy only necessary files from the build stage
 COPY --from=build /app ./
 
+EXPOSE 8083
+
 HEALTHCHECK --interval=30s \
             --timeout=5s \
             CMD curl -f --no-progress-meter http://localhost:8083/v1/health || exit 1
 
-CMD ["npm" , "run", "start-server"]
+CMD ["npm" , "run", "start"]
