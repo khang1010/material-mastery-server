@@ -24,9 +24,9 @@ services:
     networks:
       - app-network
 
-  webserver:
+  webnginx:
     image: nginx
-    container_name: webserver
+    container_name: webnginx
     restart: always
     ports:
       - '80:80'

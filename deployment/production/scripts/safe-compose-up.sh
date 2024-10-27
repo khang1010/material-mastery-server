@@ -5,7 +5,7 @@ COMMIT_HASH_SHORT=$(git rev-parse --short HEAD)
 DOCKER_PATH=deployment/production/docker
 IMAGE_NAME=material-mastery
 IMAGE_PORT=8083
-CURRENT_CONTAINER=$(sudo docker ps --format "{{.Names}}" --filter "name=server-*")
+CURRENT_CONTAINER=$(sudo docker ps --format "{{.Names}}" --filter "name=server*")
 RESTART_RETRIES=0
 HEALTH_CHECK_RETRIES=0
 
@@ -91,7 +91,7 @@ while true; do
         echo "Replacing Nginx Configure..." 
         sudo sed -i "s/server/$DESIRE_CONTAINER/g" deployment/production/nginx-conf/nginx.conf
         echo "🔄 Reloading Nginx config..."
-        sudo docker exec webserver sh -c "nginx -s reload"
+        sudo docker exec webnginx sh -c "nginx -s reload"
 
 
         echo "🚦 Stoping previous container: $(sudo docker stop $CURRENT_CONTAINER)"
