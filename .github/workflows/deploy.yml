@@ -88,7 +88,7 @@ jobs:
             cd material-mastery-server
             git config --global user.email 'github-actions[bot]@users.noreply.github.com'
             git config --global user.name 'github-actions[bot]'
-            echo $'DISTANCE_MATRIX_API_KEY=${{secrets.DISTANCE_MATRIX_API_KEY}}\nDISCORD_TOKEN=${{secrets.DISCORD_TOKEN}}\nDISCORD_CHANNEL=${{secrets.DISCORD_CHANNEL}}\nPORT=${{secrets.PORT}}\nNODE_ENV=${{secrets.NODE_ENV}}\nDEV_APP_PORT=${{secrets.DEV_APP_PORT}}\nDEV_DB_HOST=${{secrets.DEV_DB_HOST}}\nDEV_DB_NAME=${{secrets.DEV_DB_NAME}}\nDEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}\nDEV_DB_PORT=${{secrets.DEV_DB_PORT}}\nREDIS_HOST=${{secrets.REDIS_HOST}}\nREDIS_PORT=${{secrets.REDIS_PORT}}\nREDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}' > .env &&
+            echo $'DISTANCE_MATRIX_API_KEY=${{secrets.DISTANCE_MATRIX_API_KEY}}\nDISCORD_TOKEN=${{secrets.DISCORD_TOKEN}}\nDISCORD_CHANNEL=${{secrets.DISCORD_CHANNEL}}\nPORT=${{secrets.PORT}}\nNODE_ENV=${{secrets.NODE_ENV}}\nDEV_APP_PORT=${{secrets.DEV_APP_PORT}}\nDEV_DB_HOST=${{secrets.DEV_DB_HOST}}\nDEV_DB_NAME=${{secrets.DEV_DB_NAME}}\nDEV_DB_PASSWORD=${{secrets.DEV_DB_PASSWORD}}\nDEV_DB_PORT=${{secrets.DEV_DB_PORT}}\nREDIS_HOST=${{secrets.REDIS_HOST}}\nREDIS_PORT=${{secrets.REDIS_PORT}}\nREDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}' > .env
             git checkout -- deployment/production/nginx-conf/nginx.conf
             git checkout master
             git pull origin master
