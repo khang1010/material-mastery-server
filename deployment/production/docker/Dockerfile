@@ -61,6 +61,6 @@ COPY --from=build /app ./
 
 HEALTHCHECK --interval=30s \
             --timeout=5s \
-            CMD curl -f --no-progress-meter http://localhost:8083/v1/health/ || exit 1
+            CMD curl -f --no-progress-meter http://localhost:8083/v1/health || exit 1
 
 CMD ["npm" , "run", "start-server"]
