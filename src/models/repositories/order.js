@@ -1,6 +1,11 @@
 const moment = require('moment-timezone');
 const Order = require('../order.model');
-const { getSortAscending, getSortDescending, getUnSelectData, convertToObjectId } = require('../../utils');
+const {
+  getSortAscending,
+  getSortDescending,
+  getUnSelectData,
+  convertToObjectId,
+} = require('../../utils');
 
 const calculateRevenueByTimeRange = async (startTime, endTime) => {
   const totalRevenue = await Order.aggregate([
@@ -38,7 +43,10 @@ const calculateRevenueByWeek = async () => {
   const startOfWeek = now.clone().startOf('isoWeek').startOf('day');
   const endOfWeek = now.clone().endOf('isoWeek').endOf('day');
 
-  const totalRevenue = await calculateRevenueByTimeRange(startOfWeek, endOfWeek);
+  const totalRevenue = await calculateRevenueByTimeRange(
+    startOfWeek,
+    endOfWeek
+  );
 
   return totalRevenue;
 };
@@ -48,7 +56,10 @@ const calculateRevenueByMonth = async () => {
   const startOfMonth = now.clone().startOf('month');
   const endOfMonth = now.clone().endOf('month');
 
-  const totalRevenue = await calculateRevenueByTimeRange(startOfMonth, endOfMonth);
+  const totalRevenue = await calculateRevenueByTimeRange(
+    startOfMonth,
+    endOfMonth
+  );
 
   return totalRevenue;
 };
@@ -58,7 +69,10 @@ const calculateRevenueByQuarter = async () => {
   const startOfQuarter = now.clone().startOf('quarter');
   const endOfQuarter = now.clone().endOf('quarter');
 
-  const totalRevenue = await calculateRevenueByTimeRange(startOfQuarter, endOfQuarter);
+  const totalRevenue = await calculateRevenueByTimeRange(
+    startOfQuarter,
+    endOfQuarter
+  );
 
   return totalRevenue;
 };
@@ -68,25 +82,55 @@ const calculateRevenueByYear = async () => {
   const startOfYear = now.clone().startOf('year');
   const endOfYear = now.clone().endOf('year');
 
-  const totalRevenue = await calculateRevenueByTimeRange(startOfYear, endOfYear);
+  const totalRevenue = await calculateRevenueByTimeRange(
+    startOfYear,
+    endOfYear
+  );
 
   return totalRevenue;
 };
 
-const getOrdersByUser = async ({limit = 50, page = 1, sorted = ["_id"], filter = {}, unSelect = [], isAscending = true}) => {
+const getOrdersByUser = async ({
+  limit = 50,
+  page = 1,
+  sorted = ['_id'],
+  filter = {},
+  unSelect = [],
+  isAscending = true,
+}) => {
   // await Order.updateMany({}, { $set: { order_exportId: '' }})
   return await Order.find(filter)
-  .skip((page - 1) * limit)
-  .limit(limit)
-  .sort(isAscending === 'true' ? getSortAscending(sorted) : getSortDescending(sorted))
-  .select(getUnSelectData(unSelect))
-  .lean()
-}
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort(
+      isAscending === 'true'
+        ? getSortAscending(sorted)
+        : getSortDescending(sorted)
+    )
+    .select(getUnSelectData(unSelect))
+    .lean();
+};
+
+const getOrdersByIds = async (orderIds, status = null) => {
+  if (status !== null) {
+    return await Order.find({
+      _id: {
+        $in: orderIds,
+      },
+      order_status: status,
+    }).lean();
+  }
+  return await Order.find({
+    _id: {
+      $in: orderIds,
+    },
+  }).lean();
+};
 
 const updateOrderById = async (id, payload) => {
   const order = await Order.findByIdAndUpdate(id, payload, { new: true });
   return order;
-}
+};
 
 const calculateOrdersByTimeRange = async (startTime, endTime, status) => {
   const totalPendingOrders = await Order.aggregate([
@@ -107,7 +151,9 @@ const calculateOrdersByTimeRange = async (startTime, endTime, status) => {
     },
   ]);
 
-  return totalPendingOrders.length ? totalPendingOrders[0].totalPendingOrders : 0;
+  return totalPendingOrders.length
+    ? totalPendingOrders[0].totalPendingOrders
+    : 0;
 };
 
 // const getOrdersByTimeRange = async (startTime, endTime, status) => {
@@ -148,7 +194,7 @@ const getNumberOfOrdersByCustomer = async (userId, status) => {
     },
   ]);
   return totalOrders.length ? totalOrders[0].totalOrders : 0;
-}
+};
 
 module.exports = {
   calculateRevenueByDay,
@@ -160,4 +206,5 @@ module.exports = {
   updateOrderById,
   calculateOrdersByTimeRange,
   getNumberOfOrdersByCustomer,
+  getOrdersByIds,
 };
