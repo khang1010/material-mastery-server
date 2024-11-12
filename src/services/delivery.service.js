@@ -18,8 +18,8 @@ const { findUserById } = require('./user.service');
 class DeliveryService {
   static create = async (payload) => {
     const { orderIds, userId } = payload;
-    const routes = OrderService.getRouteForListOrders({ orderIds });
-    const foundUser = findUserById(userId);
+    const routes = await OrderService.getRouteForListOrders({ orderIds });
+    const foundUser = await findUserById(userId);
     return await createDelivery({ ...payload, routes });
   };
 
