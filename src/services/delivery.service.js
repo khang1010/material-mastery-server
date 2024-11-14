@@ -11,15 +11,22 @@ const {
   findDeliveryById,
   getAllDeliveriesByFilter,
 } = require('../models/repositories/delivery');
-const { getOrdersByIds } = require('../models/repositories/order');
+const {
+  getOrdersByIds,
+  getOrdersByUser,
+} = require('../models/repositories/order');
 const OrderService = require('./order.service');
 const { findUserById } = require('./user.service');
 
 class DeliveryService {
   static create = async (payload) => {
-    const { orderIds, userId } = payload;
-    const routes = await OrderService.getRouteForListOrders({ orderIds });
+    const { orderIds, userId, startLocation } = payload;
+    const routes = await OrderService.getRouteForListOrders({
+      orderIds,
+      startLocation,
+    });
     const foundUser = await findUserById(userId);
+    if (!foundUser) throw new BadRequestError('User not found');
     return await createDelivery({ ...payload, routes });
   };
 
@@ -31,12 +38,35 @@ class DeliveryService {
     return await findByUserId(userId);
   };
 
+  static getAllNotShippingOrders = async () => {
+    const deliveries = await getAllDeliveries();
+    const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
+    if (!orderIds || orderIds.length === 0) return [];
+
+    const orders = await getOrdersByUser({
+      filter: { order_status: 'shipping' },
+    });
+    const resultOrderIds = orders.filter(
+      (order) => !orderIds.includes(order._id)
+    );
+    return resultOrderIds;
+  };
+
   static deleteDeliveryById = async (id) => {
     return await deleteDeliveryById(id);
   };
 
   static updateDeliveryById = async (id, data) => {
-    return await updateDeliveryById(id, removeUndefinedObject(data));
+    const { orderIds } = data;
+    let updatedData = data;
+    if (orderIds && orderIds.length > 0) {
+      const routes = await OrderService.getRouteForListOrders({
+        orderIds,
+        startLocation,
+      });
+      updatedData = { ...data, routes };
+    }
+    return await updateDeliveryById(id, removeUndefinedObject(updatedData));
   };
 
   static updateStatusDeliveryById = async (id, status) => {
@@ -62,7 +92,7 @@ class DeliveryService {
     //   if (pendingDelivery.length > 0)
     //     throw new BadRequestError('Have another delivery is pending');
     // }
-    return await updateDeliveryById(id, status);
+    return await updateDeliveryById(id, { status });
   };
 }
 

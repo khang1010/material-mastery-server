@@ -6,6 +6,7 @@ const createDelivery = async ({
   rating = 0,
   routes = [],
   status = 'draft',
+  startLocation = null,
 }) => {
   return await deliveryModel.create({
     userId,
@@ -13,7 +14,11 @@ const createDelivery = async ({
     routes: routes.length > 0 ? routes : null,
     status,
     rating,
-    startLocation: routes && routes.length > 0 ? routes[0] : null,
+    startLocation: !startLocation
+      ? routes && routes.length > 0
+        ? routes[0]
+        : null
+      : startLocation,
   });
 };
 

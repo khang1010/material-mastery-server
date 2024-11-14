@@ -7,6 +7,10 @@ const router = express.Router();
 
 router.use(authentication);
 router.use(permission('staff'));
+router.get(
+  '/shipping',
+  asyncHandler(DeliveryController.getAllNotShippingOrders)
+);
 router.get('/:userId', asyncHandler(DeliveryController.getDeliveriesByUserId));
 router.get('/', asyncHandler(DeliveryController.getAll));
 router.post('/', asyncHandler(DeliveryController.create));

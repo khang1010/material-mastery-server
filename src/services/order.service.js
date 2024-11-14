@@ -277,7 +277,7 @@ class OrderService {
   };
 
   static getRouteForListOrders = async (payload) => {
-    const { orderIds } = payload;
+    const { orderIds, startLocation } = payload;
     if (!orderIds || orderIds.length === 0)
       throw new BadRequestError('Invalid order ids');
 
@@ -286,6 +286,7 @@ class OrderService {
       throw new BadRequestError('Order not found or not ready to ship');
 
     let locations = [];
+    if (startLocation) locations.push(startLocation);
     orders.forEach((order) => {
       const { longitude, latitude } = order.order_address;
       if (!longitude || !latitude)

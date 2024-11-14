@@ -18,6 +18,12 @@ class DeliveryController {
       metadata: await DeliveryService.getAllDeliveries(),
     }).send(res);
   };
+  static getAllNotShippingOrders = async (req, res, next) => {
+    new OkResponse({
+      message: 'Get all deliveries not shipping successfully',
+      metadata: await DeliveryService.getAllNotShippingOrders(),
+    }).send(res);
+  };
   static getDeliveriesByUserId = async (req, res, next) => {
     new OkResponse({
       message: 'Get deliveries by yser id successfully',
