@@ -51,7 +51,12 @@ class RouteService {
         unvisitedLocations,
         pheromones
       );
-      localPheromoneUpdate(pheromones, currentLocation, nextLocation, 0.05);
+      await localPheromoneUpdate(
+        pheromones,
+        currentLocation,
+        nextLocation,
+        0.05
+      );
 
       route.push(nextLocation);
       currentLocation = nextLocation;
@@ -66,7 +71,7 @@ class RouteService {
       bestDistance = routeDistance;
     }
 
-    globalPheromoneUpdate(route, pheromones, bestRoute, 0.05);
+    await globalPheromoneUpdate(route, pheromones, bestRoute, 0.05);
 
     const optimizedRoute = this.apply2Opt(route);
     // return route;

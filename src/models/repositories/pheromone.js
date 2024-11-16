@@ -137,7 +137,7 @@ async function getAllPheromones() {
   return await Pheromone.find({});
 }
 
-function localPheromoneUpdate(
+async function localPheromoneUpdate(
   pheromones,
   currentLocation,
   nextLocation,
@@ -145,12 +145,27 @@ function localPheromoneUpdate(
 ) {
   const key = `${currentLocation}-${nextLocation}`;
   if (pheromones[key]) {
+    console.log('>>>', pheromones[key].pheromone);
     pheromones[key].pheromone =
       (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1; // Thêm pheromone mới
+
+    console.log('>>>', pheromones[key].pheromone);
+    await pheromoneModel.updateOne(
+      { fromLocation: currentLocation, toLocation: nextLocation },
+      { $set: { pheromone: pheromones[key].pheromone } },
+      { upsert: true }
+    );
   }
 }
 
-function globalPheromoneUpdate(route, pheromones, bestRoute, evaporationRate) {
+async function globalPheromoneUpdate(
+  route,
+  pheromones,
+  bestRoute,
+  evaporationRate
+) {
+  const updates = [];
+
   route.forEach((location, index) => {
     if (index < route.length - 1) {
       const currentLocation = location;
@@ -162,9 +177,21 @@ function globalPheromoneUpdate(route, pheromones, bestRoute, evaporationRate) {
         pheromones[key].pheromone =
           (1 - evaporationRate) * pheromones[key].pheromone +
           evaporationRate * (bestRoute ? 2 : 1); // Nếu là bestRoute thì cộng nhiều hơn
+
+        updates.push({
+          updateOne: {
+            filter: { fromLocation: currentLocation, toLocation: nextLocation },
+            update: { $set: { pheromone: pheromones[key].pheromone } },
+            upsert: true,
+          },
+        });
       }
     }
   });
+
+  if (updates.length > 0) {
+    await pheromoneModel.bulkWrite(updates);
+  }
 }
 
 function calculateRouteRating(route) {
