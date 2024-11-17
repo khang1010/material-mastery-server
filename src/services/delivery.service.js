@@ -31,11 +31,35 @@ class DeliveryService {
   };
 
   static getAllDeliveries = async () => {
-    return await getAllDeliveries();
+    const deliveries = await getAllDeliveries();
+    const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
+    const orders = OrderService.getOrdersByIds(orderIds);
+    const result = deliveries.map((delivery) => {
+      const ordersResult = orders.filter((order) =>
+        delivery.orderIds.includes(order._id)
+      );
+      return {
+        ...delivery,
+        orderInfos: ordersResult,
+      };
+    });
+    return result;
   };
 
   static getDeliveriesByUserId = async (userId) => {
-    return await findByUserId(userId);
+    const deliveries = await findByUserId(userId);
+    const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
+    const orders = OrderService.getOrdersByIds(orderIds);
+    const result = deliveries.map((delivery) => {
+      const ordersResult = orders.filter((order) =>
+        delivery.orderIds.includes(order._id)
+      );
+      return {
+        ...delivery,
+        orderInfos: ordersResult,
+      };
+    });
+    return result;
   };
 
   static getAllNotShippingOrders = async () => {
