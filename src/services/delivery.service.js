@@ -33,7 +33,7 @@ class DeliveryService {
   static getAllDeliveries = async () => {
     const deliveries = await getAllDeliveries();
     const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
-    const orders = await OrderService.getOrdersByIds(orderIds);
+    const orders = await getOrdersByIds(orderIds);
     const result = deliveries.map((delivery) => {
       const ordersResult = orders.filter((order) =>
         delivery.orderIds.includes(order._id)
@@ -49,7 +49,7 @@ class DeliveryService {
   static getDeliveriesByUserId = async (userId) => {
     const deliveries = await findByUserId(userId);
     const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
-    const orders = await OrderService.getOrdersByIds(orderIds);
+    const orders = await getOrdersByIds(orderIds);
     const result = deliveries.map((delivery) => {
       const ordersResult = orders.filter((order) =>
         delivery.orderIds.includes(order._id)
