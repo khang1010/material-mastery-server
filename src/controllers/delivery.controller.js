@@ -26,7 +26,7 @@ class DeliveryController {
   };
   static getDeliveriesByUserId = async (req, res, next) => {
     new OkResponse({
-      message: 'Get deliveries by yser id successfully',
+      message: 'Get deliveries by user id successfully',
       metadata: await DeliveryService.getDeliveriesByUserId(req.params.userId),
     }).send(res);
   };
