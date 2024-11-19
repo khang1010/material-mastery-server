@@ -62,6 +62,17 @@ class DeliveryService {
     return result;
   };
 
+  static getDeliveriesById = async (id) => {
+    const deliveries = await findDeliveryById(id);
+    const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
+    const orders = await getOrdersByIds(orderIds);
+
+    return {
+      deliveries,
+      orderInfos: orders,
+    };
+  };
+
   static getAllNotShippingOrders = async () => {
     const deliveries = await getAllDeliveries();
     const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();

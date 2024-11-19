@@ -8,10 +8,14 @@ const router = express.Router();
 router.use(authentication);
 router.use(permission('staff'));
 router.get(
+  '/user/:userId',
+  asyncHandler(DeliveryController.getDeliveriesByUserId)
+);
+router.get(
   '/shipping',
   asyncHandler(DeliveryController.getAllNotShippingOrders)
 );
-router.get('/:userId', asyncHandler(DeliveryController.getDeliveriesByUserId));
+router.get('/:id', asyncHandler(DeliveryController.getDeliveriesById));
 router.get('/', asyncHandler(DeliveryController.getAll));
 router.post('/', asyncHandler(DeliveryController.create));
 router.delete('/:id', asyncHandler(DeliveryController.deleteDeliveryById));

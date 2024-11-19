@@ -30,6 +30,12 @@ class DeliveryController {
       metadata: await DeliveryService.getDeliveriesByUserId(req.params.userId),
     }).send(res);
   };
+  static getDeliveriesById = async (req, res, next) => {
+    new OkResponse({
+      message: 'Get deliveries by id successfully',
+      metadata: await DeliveryService.getDeliveriesById(req.params.id),
+    }).send(res);
+  };
   static deleteDeliveryById = async (req, res, next) => {
     new OkResponse({
       message: 'Delete delivery successfully',
