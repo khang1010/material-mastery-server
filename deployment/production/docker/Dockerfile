@@ -48,6 +48,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
+RUN npm install cloudinary multer multer-storage-cloudinary dotenv --legacy-peer-deps
 RUN npm install
 
 # Copy the rest of the application files and set ownership for node user
