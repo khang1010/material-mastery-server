@@ -1,14 +1,11 @@
-const { v2: cloudinary, uploader } = require('cloudinary')
+'use strict';
+const cloudinary = require('cloudinary').v2;
 
-const cloudinaryConfig = cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME ?? '',
-  api_key: process.env.CLOUDINARY_API_KEY ?? '',
-  api_secret: process.env.CLOUDINARY_SECRET ?? '',
-})
+// Cấu hình Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const cloudinaryUploader = uploader
-
-module.exports = {
-  cloudinaryConfig,
-  cloudinaryUploader,
-}
+module.exports = cloudinary;
