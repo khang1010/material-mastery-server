@@ -64,7 +64,7 @@ class DeliveryService {
 
   static getDeliveriesById = async (id) => {
     const deliveries = await findDeliveryById(id);
-    const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
+    const orderIds = deliveries.orderIds;
     const orders = await getOrdersByIds(orderIds);
 
     return {
