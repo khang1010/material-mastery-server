@@ -1,7 +1,11 @@
 'use strict';
 
 const { BadRequestError, NotFoundError } = require('../core/error-response');
-const { updateUserById, findUserById, getAllUsers } = require('../models/repositories/user');
+const {
+  updateUserById,
+  findUserById,
+  getAllUsers,
+} = require('../models/repositories/user');
 const { user, customer, staff, manager } = require('../models/user.model');
 const { removeUndefinedObject, updateNestedObject } = require('../utils');
 
@@ -58,7 +62,10 @@ class UserFactory {
   }
 
   static async getAllUsers(payload, role) {
-    return await getAllUsers({...payload, filter: {roles: {$in: [role]}}});
+    return await getAllUsers({
+      ...payload,
+      filter: { roles: { $in: [role] } },
+    });
   }
 }
 
@@ -71,6 +78,7 @@ class User {
     phone,
     status,
     roles,
+    avatar,
     user_attributes,
   }) {
     this.username = username;
@@ -80,6 +88,7 @@ class User {
     this.phone = phone;
     this.status = status;
     this.roles = roles;
+    this.avatar = avatar;
     this.user_attributes = user_attributes;
   }
 

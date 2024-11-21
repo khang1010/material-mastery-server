@@ -15,7 +15,7 @@ class ProductController {
       message: 'Create product successfully',
       metadata: await ProductService.createProduct({
         ...req.body,
-        product_thumb: req.file.path,
+        thumb: req.file.path,
       }),
     }).send(res);
   };
@@ -43,7 +43,10 @@ class ProductController {
   static update = async (req, res, next) => {
     new OkResponse({
       message: 'Update product successfully',
-      metadata: await ProductService.updateProductById(req.params.id, req.body),
+      metadata: await ProductService.updateProductById(req.params.id, {
+        ...req.body,
+        product_thumb: req?.file?.path ?? undefined,
+      }),
     }).send(res);
   };
 

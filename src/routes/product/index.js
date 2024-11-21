@@ -25,11 +25,15 @@ router.get('/publish/:id', asyncHandler(ProductController.publishProduct));
 router.get('/unpublish/:id', asyncHandler(ProductController.unPublishProduct));
 router.post(
   '/file',
-  upload.single('file'),
+  upload.single('thumb'),
   asyncHandler(ProductController.createV2)
 );
 router.post('/', asyncHandler(ProductController.create));
-router.patch('/:id', asyncHandler(ProductController.update));
+router.patch(
+  '/:id',
+  upload.single('thumb'),
+  asyncHandler(ProductController.update)
+);
 router.delete('/:id', asyncHandler(ProductController.deleteById));
 router.get('/all/draft', asyncHandler(ProductController.getAllDraft));
 
