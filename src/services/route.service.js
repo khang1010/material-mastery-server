@@ -32,49 +32,57 @@ class RouteService {
     return await updatePheromone(route, rating);
   }
 
-  static async calculateRoute(locations) {
-    let currentLocation = locations[0];
-    const route = [currentLocation];
-    let unvisitedLocations = locations.slice(1);
+  static async calculateRoute(locations, antNum = 30) {
     await initializePheromones(locations);
-
     // Lấy dữ liệu pheromone từ DB
     const pheromones = await this.getPheromonesForLocations(locations);
 
     let bestRoute = null;
-    let bestDistance = Infinity;
+    let bestScore = -Infinity;
 
     // Tính toán tuyến đường tối ưu dựa trên thuật toán EACO
-    while (unvisitedLocations.length > 0) {
-      const nextLocation = selectNextLocation(
-        currentLocation,
-        unvisitedLocations,
-        pheromones
-      );
-      await localPheromoneUpdate(
+    for (let ant = 0; ant < antNum; ant++) {
+      let currentLocation = locations[0];
+      const route = [currentLocation];
+      let unvisitedLocations = locations.slice(1);
+
+      while (unvisitedLocations.length > 0) {
+        const nextLocation = selectNextLocation(
+          currentLocation,
+          unvisitedLocations,
+          pheromones
+        );
+        await localPheromoneUpdate(
+          pheromones,
+          currentLocation,
+          nextLocation,
+          0.05
+        );
+
+        route.push(nextLocation);
+        currentLocation = nextLocation;
+        unvisitedLocations = unvisitedLocations.filter(
+          (loc) => loc !== nextLocation
+        );
+      }
+
+      const routeDistance = this.calculateTotalDistance(route);
+      // Tính điểm của tuyến đường hiện tại
+      const routeScore = this.calculateRouteScore(
+        route,
         pheromones,
-        currentLocation,
-        nextLocation,
-        0.05
+        alpha,
+        beta
       );
-
-      route.push(nextLocation);
-      currentLocation = nextLocation;
-      unvisitedLocations = unvisitedLocations.filter(
-        (loc) => loc !== nextLocation
-      );
-    }
-
-    const routeDistance = this.calculateTotalDistance(route);
-    if (routeDistance < bestDistance) {
-      bestRoute = [...route];
-      bestDistance = routeDistance;
+      if (routeScore > bestScore) {
+        bestRoute = [...route];
+        bestScore = routeScore;
+      }
     }
 
     await globalPheromoneUpdate(route, pheromones, bestRoute, 0.05);
 
-    const optimizedRoute = this.apply2Opt(route);
-    // return route;
+    const optimizedRoute = this.apply2Opt(bestRoute);
     return optimizedRoute;
   }
 
@@ -119,6 +127,25 @@ class RouteService {
       j--;
     }
     return newRoute;
+  }
+
+  static calculateRouteScore(route, pheromones, alpha = 1, beta = 2) {
+    let totalScore = 0;
+
+    for (let i = 0; i < route.length - 1; i++) {
+      const fromLocation = route[i];
+      const toLocation = route[i + 1];
+      const key = `${fromLocation}-${toLocation}`;
+      const { pheromone, heuristic } = pheromones[key] || {
+        pheromone: 1,
+        heuristic: 1,
+      };
+
+      // Tính điểm dựa trên pheromone và heuristic
+      totalScore += Math.pow(pheromone, alpha) * Math.pow(heuristic, beta);
+    }
+
+    return totalScore;
   }
 }
 
