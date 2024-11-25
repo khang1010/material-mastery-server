@@ -149,7 +149,6 @@ async function localPheromoneUpdate(
     pheromones[key].pheromone =
       (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1; // Thêm pheromone mới
 
-    console.log('>>>', pheromones[key].pheromone);
     await pheromoneModel.updateOne(
       { fromLocation: currentLocation, toLocation: nextLocation },
       { $set: { pheromone: pheromones[key].pheromone } },

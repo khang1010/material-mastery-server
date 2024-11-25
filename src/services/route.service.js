@@ -32,7 +32,7 @@ class RouteService {
     return await updatePheromone(route, rating);
   }
 
-  static async calculateRoute(locations, antNum = 30) {
+  static async calculateRoute(locations, antNum = 10) {
     await initializePheromones(locations);
     // Lấy dữ liệu pheromone từ DB
     const pheromones = await this.getPheromonesForLocations(locations);
@@ -75,9 +75,9 @@ class RouteService {
       }
     }
 
+    await globalPheromoneUpdate(bestRoute, pheromones, bestRoute, 0.1, 100);
+
     const optimizedRoute = this.apply2Opt(bestRoute);
-    // TODO: check again
-    await globalPheromoneUpdate(bestRoute, pheromones, optimizedRoute, 0.05);
     return optimizedRoute;
   }
 
