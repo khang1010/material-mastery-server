@@ -68,12 +68,7 @@ class RouteService {
 
       const routeDistance = this.calculateTotalDistance(route);
       // Tính điểm của tuyến đường hiện tại
-      const routeScore = this.calculateRouteScore(
-        route,
-        pheromones,
-        alpha,
-        beta
-      );
+      const routeScore = this.calculateRouteScore(route, pheromones);
       if (routeScore > bestScore) {
         bestRoute = [...route];
         bestScore = routeScore;
