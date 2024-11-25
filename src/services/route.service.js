@@ -75,9 +75,9 @@ class RouteService {
       }
     }
 
-    await globalPheromoneUpdate(route, pheromones, bestRoute, 0.05);
-
     const optimizedRoute = this.apply2Opt(bestRoute);
+    // TODO: check again
+    await globalPheromoneUpdate(bestRoute, pheromones, optimizedRoute, 0.05);
     return optimizedRoute;
   }
 
