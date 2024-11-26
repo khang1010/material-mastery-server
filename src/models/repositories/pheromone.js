@@ -145,9 +145,10 @@ async function localPheromoneUpdate(
 ) {
   const key = `${currentLocation}-${nextLocation}`;
   if (pheromones[key]) {
-    console.log('>>>', pheromones[key].pheromone);
+    // pheromones[key].pheromone =
+    //   (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1;
     pheromones[key].pheromone =
-      (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1; // Thêm pheromone mới
+      (1 - evaporationRate) * pheromones[key].pheromone;
 
     await pheromoneModel.updateOne(
       { fromLocation: currentLocation, toLocation: nextLocation },

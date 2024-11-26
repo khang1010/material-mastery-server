@@ -1,5 +1,6 @@
 'use strict';
 
+const pheromoneModel = require('../models/pheromone.model');
 const {
   updatePheromone,
   getPheromone,
@@ -66,7 +67,7 @@ class RouteService {
         );
       }
 
-      const routeDistance = this.calculateTotalDistance(route);
+      // const routeDistance = this.calculateTotalDistance(route);
       // Tính điểm của tuyến đường hiện tại
       const routeScore = this.calculateRouteScore(route, pheromones);
       if (routeScore > bestScore) {
@@ -141,6 +142,53 @@ class RouteService {
     }
 
     return totalScore;
+  }
+
+  static async globalPheromoneUpdate(
+    bestRoute,
+    pheromones,
+    evaporationRate,
+    Q = 100
+  ) {
+    const updates = [];
+    const bestDistance = this.calculateTotalDistance(bestRoute);
+
+    // Bay hơi pheromone trên tất cả các tuyến đường
+    for (const key in pheromones) {
+      if (pheromones[key]) {
+        pheromones[key].pheromone *= 1 - evaporationRate; // Bay hơi pheromone
+      }
+    }
+
+    // Thêm pheromone trên các đoạn thuộc bestRoute
+    bestRoute.forEach((location, index) => {
+      if (index < bestRoute.length - 1) {
+        const currentLocation = location;
+        const nextLocation = bestRoute[index + 1];
+        const key = `${currentLocation}-${nextLocation}`;
+
+        if (pheromones[key]) {
+          // Tính lượng pheromone bổ sung dựa trên tổng quãng đường
+          const deltaPheromone = Q / bestDistance;
+          pheromones[key].pheromone += deltaPheromone;
+
+          updates.push({
+            updateOne: {
+              filter: {
+                fromLocation: currentLocation,
+                toLocation: nextLocation,
+              },
+              update: { $set: { pheromone: pheromones[key].pheromone } },
+              upsert: true,
+            },
+          });
+        }
+      }
+    });
+
+    if (updates.length > 0) {
+      await pheromoneModel.bulkWrite(updates);
+    }
   }
 }
 
