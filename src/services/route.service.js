@@ -8,6 +8,7 @@ const {
   initializePheromones,
   localPheromoneUpdate,
   globalPheromoneUpdate,
+  globalPheromoneUpdateV2,
 } = require('../models/repositories/pheromone');
 
 class RouteService {
@@ -76,7 +77,8 @@ class RouteService {
       }
     }
 
-    await globalPheromoneUpdate(bestRoute, pheromones, bestRoute, 0.1, 100);
+    const routeDistance = this.calculateTotalDistance(bestRoute);
+    await globalPheromoneUpdateV2(bestRoute, pheromones, 0.05, routeDistance);
 
     const optimizedRoute = this.apply2Opt(bestRoute);
     return optimizedRoute;

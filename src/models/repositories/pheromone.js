@@ -148,7 +148,7 @@ async function localPheromoneUpdate(
     // pheromones[key].pheromone =
     //   (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1;
     pheromones[key].pheromone =
-      (1 - evaporationRate) * pheromones[key].pheromone;
+      (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 0.1;
 
     await pheromoneModel.updateOne(
       { fromLocation: currentLocation, toLocation: nextLocation },
@@ -212,6 +212,51 @@ function calculateRouteRating(route) {
   return totalRating / (route.length - 1);
 }
 
+async function globalPheromoneUpdateV2(
+  bestRoute,
+  pheromones,
+  evaporationRate,
+  bestDistance,
+  Q = 100
+) {
+  const updates = [];
+  // const bestDistance = this.calculateTotalDistance(bestRoute);
+
+  // Bay hơi pheromone trên tất cả các tuyến đường
+  for (const key in pheromones) {
+    if (pheromones[key]) {
+      pheromones[key].pheromone *= 1 - evaporationRate;
+    }
+  }
+
+  // Thêm pheromone trên các đoạn thuộc bestRoute
+  bestRoute.forEach((location, index) => {
+    if (index < bestRoute.length - 1) {
+      const currentLocation = location;
+      const nextLocation = bestRoute[index + 1];
+      const key = `${currentLocation}-${nextLocation}`;
+
+      if (pheromones[key]) {
+        const deltaPheromone = Q / bestDistance;
+        pheromones[key].pheromone += deltaPheromone;
+
+        updates.push({
+          updateOne: {
+            filter: { fromLocation: currentLocation, toLocation: nextLocation },
+            update: { $set: { pheromone: pheromones[key].pheromone } },
+            upsert: true,
+          },
+        });
+      }
+    }
+  });
+
+  // Cập nhật vào DB
+  if (updates.length > 0) {
+    await pheromoneModel.bulkWrite(updates);
+  }
+}
+
 function calculateHeuristic(distance, scalingFactor = 100) {
   return 1 / (distance + scalingFactor); // Tỷ lệ heuristic dựa trên khoảng cách và yếu tố điều chỉnh
 }
@@ -228,4 +273,5 @@ module.exports = {
   globalPheromoneUpdate,
   calculateRouteRating,
   calculateHeuristic,
+  globalPheromoneUpdateV2,
 };
