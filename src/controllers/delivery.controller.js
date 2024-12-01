@@ -60,6 +60,16 @@ class DeliveryController {
       ),
     }).send(res);
   };
+  static assignNearbyOrdersToDelivery = async (req, res, next) => {
+    new OkResponse({
+      message: 'Assign nearby orders to delivery successfully',
+      metadata: await DeliveryService.assignNearbyOrdersToDelivery(
+        req.params.id,
+        req.body.orderIds,
+        req.body.radius
+      ),
+    }).send(res);
+  };
 }
 
 module.exports = DeliveryController;

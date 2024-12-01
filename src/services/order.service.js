@@ -11,11 +11,13 @@ const {
   calculateOrdersByTimeRange,
   getNumberOfOrdersByCustomer,
   getOrdersByIds,
+  getOrdersByNotIds,
 } = require('../models/repositories/order');
 const { convertToObjectId, updateNestedObject } = require('../utils');
 const ProductService = require('./product.service');
 const { findUserById } = require('../models/repositories/user');
 const RouteService = require('./route.service');
+const orderModel = require('../models/order.model');
 
 class OrderService {
   static getOrdersByCustomer = async (payload) => {
@@ -296,6 +298,76 @@ class OrderService {
 
     const route = RouteService.calculateRoute(locations);
     return route;
+  };
+
+  static calculateHaversineDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Bán kính Trái Đất (km)
+
+    const toRadians = (degrees) => (degrees * Math.PI) / 180;
+
+    const deltaLat = toRadians(lat2 - lat1);
+    const deltaLon = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+      Math.cos(toRadians(lat1)) *
+        Math.cos(toRadians(lat2)) *
+        Math.sin(deltaLon / 2) *
+        Math.sin(deltaLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Khoảng cách tính bằng km
+  };
+
+  static getNearbyOrders = async (orders, radius) => {
+    const nearbyOrders = [];
+
+    // Tìm các đơn hàng khác trong cơ sở dữ liệu
+    const candidates = await getOrdersByNotIds(
+      orders.map((order) => order._id),
+      'shipping'
+    );
+
+    for (const order of orders) {
+      const { longitude: baseLongitude, latitude: baseLatitude } =
+        order.order_address;
+      if (!baseLongitude || !baseLatitude) continue;
+      const nearbyOrder = {
+        rootOrder: order._id,
+        nearbyOrders: [],
+        nearbyOrderIds: [],
+      };
+
+      for (const candidate of candidates) {
+        const { longitude: candidateLongitude, latitude: candidateLatitude } =
+          candidate.order_address;
+
+        if (!candidateLongitude || !candidateLatitude) continue;
+
+        // Tính khoảng cách bằng công thức Haversine
+        const distance = this.calculateHaversineDistance(
+          baseLatitude,
+          baseLongitude,
+          candidateLatitude,
+          candidateLongitude
+        );
+
+        // Nếu khoảng cách nằm trong bán kính, thêm vào danh sách
+        if (distance <= radius) {
+          nearbyOrder.nearbyOrders.push(candidate);
+          nearbyOrder.nearbyOrderIds.push(candidate._id);
+        }
+      }
+
+      nearbyOrders.push(nearbyOrder);
+    }
+
+    return nearbyOrders;
+  };
+
+  static getNearbyOrdersByIds = async (orderIds, radius) => {
+    const orders = await getOrdersByIds(orderIds);
+    return this.getNearbyOrders(orders, radius);
   };
 }
 

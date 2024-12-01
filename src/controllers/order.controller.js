@@ -47,6 +47,24 @@ class OrderController {
       metadata: await OrderService.getNumberOfOrderByTimeRange(req.query),
     }).send(res);
   };
+  static getNearbyOrdersByIds = async (req, res, next) => {
+    new OkResponse({
+      message: 'Get nearby orders by ids successfully',
+      metadata: await OrderService.getNearbyOrdersByIds(
+        req.query.orderIds,
+        req.query.radius
+      ),
+    }).send(res);
+  };
+  static getNearbyOrdersById = async (req, res, next) => {
+    new OkResponse({
+      message: 'Get nearby orders by id successfully',
+      metadata: await OrderService.getNearbyOrdersByIds(
+        req.params.orderId,
+        req.query.radius
+      ),
+    }).send(res);
+  };
   static cancelProductByCustomer = async (req, res, next) => {
     new OkResponse({
       message: 'Cancel product successfully',

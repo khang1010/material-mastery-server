@@ -28,6 +28,11 @@ router.get(
   '/payment/status',
   asyncHandler(OrderController.getOrdersByPaymentStatus)
 );
+router.get(
+  '/nearby/:orderId',
+  asyncHandler(OrderController.getNearbyOrdersById)
+);
+router.get('/nearby', asyncHandler(OrderController.getNearbyOrdersByIds));
 router.get('/staff', asyncHandler(OrderController.getOrdersByStaff));
 router.patch(
   '/status/payment/:id',

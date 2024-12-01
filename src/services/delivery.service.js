@@ -64,6 +64,8 @@ class DeliveryService {
 
   static getDeliveriesById = async (id) => {
     const deliveries = await findDeliveryById(id);
+    if (!deliveries) throw new BadRequestError('Delivery not found');
+
     const orderIds = deliveries.orderIds;
     const orders = await getOrdersByIds(orderIds);
 
@@ -128,6 +130,39 @@ class DeliveryService {
     //     throw new BadRequestError('Have another delivery is pending');
     // }
     return await updateDeliveryById(id, { status });
+  };
+
+  static assignNearbyOrdersToDelivery = async (
+    deliveryId,
+    orderIds,
+    radius
+  ) => {
+    const delivery = await findDeliveryById(deliveryId);
+    if (!delivery) throw new BadRequestError('Delivery not found');
+
+    orderIds.forEach((orderId) => {
+      if (!delivery.orderIds.includes(orderId))
+        throw new BadRequestError('Order not assigned to delivery');
+    });
+
+    const nearbyOrders = await OrderService.getNearbyOrdersByIds(
+      orderIds,
+      radius
+    );
+    const nearbyOrderIds = nearbyOrders
+      .map((nearbyOrder) => {
+        return nearbyOrder.nearbyOrderIds;
+      })
+      .flat();
+
+    const updatedOrderIds = [
+      ...delivery.orderIds,
+      ...Array.from(new Set(nearbyOrderIds)),
+    ];
+    if (updatedOrderIds.length === delivery.orderIds.length) {
+      return delivery;
+    }
+    return await updateDeliveryById(deliveryId, { orderIds: updatedOrderIds });
   };
 }
 

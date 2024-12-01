@@ -20,6 +20,10 @@ router.get('/', asyncHandler(DeliveryController.getAll));
 router.post('/', asyncHandler(DeliveryController.create));
 router.delete('/:id', asyncHandler(DeliveryController.deleteDeliveryById));
 router.patch(
+  '/nearby-orders/:id',
+  asyncHandler(DeliveryController.assignNearbyOrdersToDelivery)
+);
+router.patch(
   '/status/:id',
   asyncHandler(DeliveryController.updateStatusDeliveryById)
 );

@@ -127,6 +127,22 @@ const getOrdersByIds = async (orderIds, status = null) => {
   }).lean();
 };
 
+const getOrdersByNotIds = async (excludedOrderIds, status = null) => {
+  if (status !== null) {
+    return await Order.find({
+      _id: {
+        $nin: excludedOrderIds,
+      },
+      order_status: status,
+    }).lean();
+  }
+  return await Order.find({
+    _id: {
+      $nin: excludedOrderIds,
+    },
+  }).lean();
+};
+
 const updateOrderById = async (id, payload) => {
   const order = await Order.findByIdAndUpdate(id, payload, { new: true });
   return order;
@@ -207,4 +223,5 @@ module.exports = {
   calculateOrdersByTimeRange,
   getNumberOfOrdersByCustomer,
   getOrdersByIds,
+  getOrdersByNotIds,
 };
