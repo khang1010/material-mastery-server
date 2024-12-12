@@ -7,7 +7,7 @@ router.get('/send/:email', asyncHandler(AuthController.sendVerificationEmail));
 router.get('/verify/:code', asyncHandler(AuthController.verifyEmail));
 router.get(
   '/reset-password/verify/:code',
-  asyncHandler(AuthController.verifyEmail)
+  asyncHandler(AuthController.verifyEmailWithoutDeleteCode)
 );
 router.patch(
   '/reset-password/:code',

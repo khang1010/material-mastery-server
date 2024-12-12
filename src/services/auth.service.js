@@ -13,10 +13,10 @@ const {
 const UserFactory = require('./user.service');
 // const twilio = require('twilio');
 const GOOGLE_MAILER_CLIENT_ID =
-  '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com';
-const GOOGLE_MAILER_CLIENT_SECRET = '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';
+  '1059699599269-safp8oq6br8vour80537j0vpnpd7ar6f.apps.googleusercontent.com';
+const GOOGLE_MAILER_CLIENT_SECRET = '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';
 const GOOGLE_MAILER_REFRESH_TOKEN =
-  '1//04LnuDlLXRS3RCgYIARAAGAQSNwF-L9IrGx-lMgFdi3GiXWn7bWPt49BwQHjc1igwexxiqVOqzOh89jazGjHci8P3R_9nCkA3BIo';
+  '1//04njuwhbxpdgBCgYIARAAGAQSNwF-L9Ir5YRqGLfNvEIF6JWoycEAAKtcF31Nl7LaWHikgu0wp_4lLBUi37K8He8Af-ENM4HlLmo';
 const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com';
 
 const myOAuth2Client = new OAuth2Client(
@@ -43,9 +43,11 @@ class AuthService {
     const verificationCode = Math.floor(Math.random() * (max - min + 1)) + min;
     return verificationCode.toString();
   };
-  static sendVerificationEmail = async (email) => {
-    const foundUser = await user.findOne({ email }).lean();
-    if (foundUser) throw new BadRequestError('Email already exists');
+  static sendVerificationEmail = async (email, isCheckExist = true) => {
+    if (isCheckExist !== 'false') {
+      const foundUser = await user.findOne({ email }).lean();
+      if (foundUser) throw new BadRequestError('Email already exists');
+    }
     try {
       const myAccessTokenObject = await myOAuth2Client.getAccessToken();
       const myAccessToken = myAccessTokenObject?.token;
@@ -171,9 +173,13 @@ class AuthService {
     const foundUser = await findByEmailOrUsername(userEmail);
     if (!foundUser) throw new BadRequestError('User not found');
 
-    const updatedUser = await UserFactory.updateUser(foundUser._id, user_id, {
-      password: newPassword,
-    });
+    const updatedUser = await UserFactory.updateUser(
+      foundUser._id,
+      foundUser._id,
+      {
+        password: newPassword,
+      }
+    );
     await redisClient.del(`verification:${code}`);
     return updatedUser;
   };

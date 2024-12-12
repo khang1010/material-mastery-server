@@ -7,7 +7,10 @@ class AuthController {
   static sendVerificationEmail = async (req, res, next) => {
     new OkResponse({
       message: 'Send verification email successfully',
-      metadata: await AuthService.sendVerificationEmail(req.params.email),
+      metadata: await AuthService.sendVerificationEmail(
+        req.params.email,
+        req.query.isCheckExist
+      ),
     }).send(res);
   };
   static verifyEmail = async (req, res, next) => {
