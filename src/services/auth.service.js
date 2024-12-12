@@ -4,6 +4,13 @@ const redisClient = require('../dbs/init-redis');
 const { OAuth2Client } = require('google-auth-library');
 const { BadRequestError } = require('../core/error-response');
 const { user } = require('../models/user.model');
+const { findByEmailOrUsername } = require('../models/repositories/user');
+const crypto = require('crypto');
+const {
+  createTokenPair,
+  createOrUpdateKeyToken,
+} = require('../models/repositories/keyToken');
+const UserFactory = require('./user.service');
 // const twilio = require('twilio');
 const GOOGLE_MAILER_CLIENT_ID =
   '667971001401-r5dtcf3mga4m0h1r5mkhi817k1jqqpne.apps.googleusercontent.com';
@@ -147,6 +154,86 @@ class AuthService {
     if (!foundEmail) throw new BadRequestError('Invalid verification code');
     await redisClient.del(`verification:${code}`);
     return foundEmail;
+  };
+
+  static verifyEmailCodeWithoutDeleteCode = async (code) => {
+    const foundEmail = await redisClient.get(`verification:${code}`);
+    if (!foundEmail) throw new BadRequestError('Invalid verification code');
+    return foundEmail;
+  };
+
+  static verifyCodeAndUpdatePassword = async (code, userEmail, newPassword) => {
+    const foundEmail = await redisClient.get(`verification:${code}`);
+    if (!foundEmail) throw new BadRequestError('Invalid verification code');
+    if (foundEmail !== userEmail)
+      throw new BadRequestError('Invalid verification code');
+
+    const foundUser = await findByEmailOrUsername(userEmail);
+    if (!foundUser) throw new BadRequestError('User not found');
+
+    const updatedUser = await UserFactory.updateUser(foundUser._id, user_id, {
+      password: newPassword,
+    });
+    await redisClient.del(`verification:${code}`);
+    return updatedUser;
+  };
+
+  static verifyResetPassword = async (code, userEmail) => {
+    const foundEmail = await redisClient.get(`verification:${code}`);
+    if (!foundEmail) throw new BadRequestError('Invalid verification code');
+    if (foundEmail !== userEmail)
+      throw new BadRequestError('Invalid verification code');
+
+    const foundUser = await findByEmailOrUsername(userEmail);
+    if (!foundUser) throw new BadRequestError('User not found');
+
+    const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: 'pkcs1',
+        format: 'pem',
+      },
+      privateKeyEncoding: {
+        type: 'pkcs1',
+        format: 'pem',
+      },
+    });
+    //create token pair
+    const payloadToken = {
+      userId: (await foundUser)._id,
+      username: foundUser.username,
+      passwordHash: foundUser.password,
+      email: foundUser.email,
+      display_name: foundUser.display_name,
+      phone: foundUser.phone,
+      roles: foundUser.roles,
+      user_attributes: foundUser.user_attributes,
+    };
+    const tokenPair = await createTokenPair(
+      payloadToken,
+      publicKey,
+      privateKey
+    );
+    if (!tokenPair) throw new BadRequestError('Create token pair failed');
+
+    if (
+      !(await createOrUpdateKeyToken(
+        (
+          await foundUser
+        )._id,
+        publicKey,
+        privateKey,
+        tokenPair.refreshToken
+      ))
+    )
+      throw new BadRequestError('Create key token failed');
+
+    await redisClient.del(`verification:${code}`);
+
+    return {
+      user: foundUser,
+      tokenPair,
+    };
   };
 
   // static sendVerificationSMS = async (phone) => {
