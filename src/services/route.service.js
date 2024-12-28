@@ -136,7 +136,7 @@ class RouteService {
       const key = `${fromLocation}-${toLocation}`;
       const { pheromone, heuristic } = pheromones[key] || {
         pheromone: 1,
-        heuristic: 1,
+        heuristic: 1 / this.calculateTotalDistance([fromLocation, toLocation]),
       };
 
       // Tính điểm dựa trên pheromone và heuristic

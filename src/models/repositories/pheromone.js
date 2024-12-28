@@ -145,10 +145,10 @@ async function localPheromoneUpdate(
 ) {
   const key = `${currentLocation}-${nextLocation}`;
   if (pheromones[key]) {
-    // pheromones[key].pheromone =
-    //   (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1;
     pheromones[key].pheromone =
-      (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 0.1;
+      (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 1;
+    // pheromones[key].pheromone =
+    //   (1 - evaporationRate) * pheromones[key].pheromone + evaporationRate * 0.1;
 
     await pheromoneModel.updateOne(
       { fromLocation: currentLocation, toLocation: nextLocation },
@@ -225,7 +225,11 @@ async function globalPheromoneUpdateV2(
   // Bay hơi pheromone trên tất cả các tuyến đường
   for (const key in pheromones) {
     if (pheromones[key]) {
-      pheromones[key].pheromone *= 1 - evaporationRate;
+      // pheromones[key].pheromone *= 1 - evaporationRate;
+      pheromones[key].pheromone = Math.max(
+        (1 - evaporationRate) * pheromones[key].pheromone,
+        0.01 // Giá trị pheromone tối thiểu
+      );
     }
   }
 
@@ -261,6 +265,19 @@ function calculateHeuristic(distance, scalingFactor = 100) {
   return 1 / (distance + scalingFactor); // Tỷ lệ heuristic dựa trên khoảng cách và yếu tố điều chỉnh
 }
 
+function calculateTotalDistance(route) {
+  let totalDistance = 0;
+  for (let i = 0; i < route.length - 1; i++) {
+    const fromLocation = route[i];
+    const toLocation = route[i + 1];
+    const pheromoneRecord = getPheromone(fromLocation, toLocation);
+    if (pheromoneRecord) {
+      totalDistance += pheromoneRecord.distance;
+    }
+  }
+  return totalDistance;
+}
+
 module.exports = {
   initializePheromones,
   updatePheromone,
@@ -274,4 +291,5 @@ module.exports = {
   calculateRouteRating,
   calculateHeuristic,
   globalPheromoneUpdateV2,
+  calculateTotalDistance,
 };
