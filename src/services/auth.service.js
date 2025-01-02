@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 const redisClient = require('../dbs/init-redis');
 const { OAuth2Client } = require('google-auth-library');
@@ -12,11 +13,9 @@ const {
 } = require('../models/repositories/keyToken');
 const UserFactory = require('./user.service');
 // const twilio = require('twilio');
-const GOOGLE_MAILER_CLIENT_ID =
-  '1059699599269-safp8oq6br8vour80537j0vpnpd7ar6f.apps.googleusercontent.com';
-const GOOGLE_MAILER_CLIENT_SECRET = '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';
-const GOOGLE_MAILER_REFRESH_TOKEN =
-  '1//04njuwhbxpdgBCgYIARAAGAQSNwF-L9Ir5YRqGLfNvEIF6JWoycEAAKtcF31Nl7LaWHikgu0wp_4lLBUi37K8He8Af-ENM4HlLmo';
+const GOOGLE_MAILER_CLIENT_ID = process.env.GOOGLE_MAILER_CLIENT_ID;
+const GOOGLE_MAILER_CLIENT_SECRET = process.env.GOOGLE_MAILER_CLIENT_SECRET;
+const GOOGLE_MAILER_REFRESH_TOKEN = process.env.GOOGLE_MAILER_REFRESH_TOKEN;
 const ADMIN_EMAIL_ADDRESS = 'materialmastery@gmail.com';
 
 const myOAuth2Client = new OAuth2Client(
