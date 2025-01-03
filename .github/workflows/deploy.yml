@@ -90,6 +90,7 @@ jobs:
         run: |
           ssh -tt -i "key.pem" -o StrictHostKeyChecking=no ec2-user@13.215.48.173 << 'EOF'
             set -e
+            git clone https://github.com/khang1010/material-mastery-server.git
             cd material-mastery-server
             git config --global user.email 'github-actions[bot]@users.noreply.github.com'
             git config --global user.name 'github-actions[bot]'
