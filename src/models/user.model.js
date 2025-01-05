@@ -90,6 +90,7 @@ var staffSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    companyId: { type: String, required: false },
   },
   {
     timestamps: true,
@@ -112,6 +113,7 @@ var managerSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    companyId: { type: String, required: false },
   },
   {
     timestamps: true,

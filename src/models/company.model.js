@@ -4,7 +4,7 @@ const DOCUMENT_NAME = 'company';
 const COLLECTION_NAME = 'companies';
 
 // Declare the Schema of the Mongo model
-var deliverySchema = new mongoose.Schema(
+var companySchema = new mongoose.Schema(
   {
     company_name: { type: String, required: true },
     company_description: { type: String, default: '' },
@@ -33,4 +33,4 @@ var deliverySchema = new mongoose.Schema(
 );
 
 //Export the model
-module.exports = mongoose.model(DOCUMENT_NAME, deliverySchema);
+module.exports = mongoose.model(DOCUMENT_NAME, companySchema);

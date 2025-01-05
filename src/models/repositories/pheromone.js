@@ -117,6 +117,60 @@ function selectNextLocation(currentLocation, unvisitedLocations, pheromones) {
   return unvisitedLocations[0]; // Phòng trường hợp không chọn được điểm nào
 }
 
+function selectNextLocationV2(
+  currentLocation,
+  unvisitedLocations,
+  startLocation,
+  pheromones
+) {
+  let totalPheromone = 0;
+  const probabilities = [];
+
+  unvisitedLocations.forEach((location) => {
+    const key = `${currentLocation}-${location}`;
+    const pheromoneValue = pheromones[key] ? pheromones[key].pheromone : 1;
+    const heuristicValue = pheromones[key] ? pheromones[key].heuristic : 1;
+
+    // Tính toán saving (U_{ij}) dựa trên khoảng cách
+    const savingValue =
+      (pheromones[`${currentLocation}-${startLocation}`]?.distance || 1) +
+      (pheromones[`${location}-${startLocation}`]?.distance || 1) -
+      (pheromones[key]?.distance || 1);
+
+    totalPheromone +=
+      Math.pow(pheromoneValue, 1) *
+      Math.pow(heuristicValue, 2) *
+      Math.pow(savingValue, 1);
+    probabilities.push({
+      location,
+      pheromone: pheromoneValue,
+      heuristic: heuristicValue,
+      saving: savingValue,
+    });
+  });
+
+  probabilities.forEach((prob) => {
+    prob.probability =
+      (Math.pow(prob.pheromone, 1) *
+        Math.pow(prob.heuristic, 2) *
+        Math.pow(prob.saving, 1)) /
+      totalPheromone;
+  });
+
+  // Chọn điểm tiếp theo dựa trên xác suất
+  const randomValue = Math.random();
+  let cumulativeProbability = 0;
+
+  for (const prob of probabilities) {
+    cumulativeProbability += prob.probability;
+    if (randomValue <= cumulativeProbability) {
+      return prob.location;
+    }
+  }
+
+  return unvisitedLocations[0]; // Phòng trường hợp không chọn được điểm nào
+}
+
 async function getPheromone(fromLocation, toLocation) {
   return await pheromoneModel.findOne({ fromLocation, toLocation });
 }
@@ -282,6 +336,7 @@ module.exports = {
   initializePheromones,
   updatePheromone,
   selectNextLocation,
+  selectNextLocationV2,
   getAllPheromones,
   updatePheromoneData,
   getPheromone,

@@ -5,6 +5,7 @@ const {
   updatePheromone,
   getPheromone,
   selectNextLocation,
+  selectNextLocationV2,
   initializePheromones,
   localPheromoneUpdate,
   globalPheromoneUpdate,
@@ -38,6 +39,7 @@ class RouteService {
     await initializePheromones(locations);
     // Lấy dữ liệu pheromone từ DB
     const pheromones = await this.getPheromonesForLocations(locations);
+    const startLocation = locations[0];
 
     let bestRoute = null;
     let bestScore = -Infinity;
@@ -49,9 +51,10 @@ class RouteService {
       let unvisitedLocations = locations.slice(1);
 
       while (unvisitedLocations.length > 0) {
-        const nextLocation = selectNextLocation(
+        const nextLocation = selectNextLocationV2(
           currentLocation,
           unvisitedLocations,
+          startLocation,
           pheromones
         );
         await localPheromoneUpdate(
@@ -68,11 +71,14 @@ class RouteService {
         );
       }
 
+      // Tinh chỉnh lộ trình với 2-opt
+      const optimizedRoute = this.apply2Opt(route);
+
       // const routeDistance = this.calculateTotalDistance(route);
       // Tính điểm của tuyến đường hiện tại
-      const routeScore = this.calculateRouteScore(route, pheromones);
+      const routeScore = this.calculateRouteScore(optimizedRoute, pheromones);
       if (routeScore > bestScore) {
-        bestRoute = [...route];
+        bestRoute = [...optimizedRoute];
         bestScore = routeScore;
       }
     }
@@ -80,8 +86,8 @@ class RouteService {
     const routeDistance = this.calculateTotalDistance(bestRoute);
     await globalPheromoneUpdateV2(bestRoute, pheromones, 0.05, routeDistance);
 
-    const optimizedRoute = this.apply2Opt(bestRoute);
-    return optimizedRoute;
+    // const optimizedRoute = this.apply2Opt(bestRoute);
+    return bestRoute;
   }
 
   static calculateTotalDistance(route) {
