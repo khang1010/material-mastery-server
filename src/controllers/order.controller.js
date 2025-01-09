@@ -52,7 +52,8 @@ class OrderController {
       message: 'Get nearby orders by ids successfully',
       metadata: await OrderService.getNearbyOrdersByIds(
         req.query.orderIds,
-        req.query.radius
+        req.query.radius,
+        { page: req.query.page, limit: req.query.limit }
       ),
     }).send(res);
   };
@@ -61,7 +62,8 @@ class OrderController {
       message: 'Get nearby orders by id successfully',
       metadata: await OrderService.getNearbyOrdersByIds(
         req.params.orderId,
-        req.query.radius
+        req.query.radius,
+        { page: req.query.page, limit: req.query.limit }
       ),
     }).send(res);
   };

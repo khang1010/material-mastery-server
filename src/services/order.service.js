@@ -365,9 +365,16 @@ class OrderService {
     return nearbyOrders;
   };
 
-  static getNearbyOrdersByIds = async (orderIds, radius) => {
+  static getNearbyOrdersByIds = async (orderIds, radius, query) => {
     const orders = await getOrdersByIds(orderIds);
-    return this.getNearbyOrders(orders, radius);
+    const { limit = 10, page = 1 } = query;
+    const nearbyOrders = await this.getNearbyOrders(orders, radius);
+    console.log('>>>', nearbyOrders.length);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    return nearbyOrders.slice(startIndex, endIndex);
   };
 }
 
