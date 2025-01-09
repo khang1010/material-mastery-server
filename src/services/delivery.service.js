@@ -1,7 +1,6 @@
 'use strict';
 
 const { BadRequestError } = require('../core/error-response');
-const { findById } = require('../models/delivery.model');
 const {
   createDelivery,
   getAllDeliveries,
@@ -9,7 +8,7 @@ const {
   updateDeliveryById,
   findByUserId,
   findDeliveryById,
-  getAllDeliveriesByFilter,
+  getDeliveriesByUser,
 } = require('../models/repositories/delivery');
 const {
   getOrdersByIds,
@@ -30,8 +29,8 @@ class DeliveryService {
     return await createDelivery({ ...payload, routes });
   };
 
-  static getAllDeliveries = async () => {
-    const deliveries = await getAllDeliveries();
+  static getAllDeliveries = async (query) => {
+    const deliveries = await getDeliveriesByUser(query || {}); // await getAllDeliveries();
     const orderIds = deliveries.map((delivery) => delivery.orderIds).flat();
     const orders = await getOrdersByIds(orderIds);
     const result = deliveries.map((delivery) => {

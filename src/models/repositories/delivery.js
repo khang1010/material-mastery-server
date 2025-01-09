@@ -1,4 +1,9 @@
 const deliveryModel = require('../delivery.model');
+const {
+  getSortAscending,
+  getSortDescending,
+  getUnSelectData,
+} = require('../../utils');
 
 const createDelivery = async ({
   userId,
@@ -62,6 +67,27 @@ const getAllDeliveriesByFilter = async ({ limit = 50, page = 1, filter }) => {
     .lean();
 };
 
+const getDeliveriesByUser = async ({
+  limit = 50,
+  page = 1,
+  sorted = ['createdAt'],
+  filter = {},
+  unSelect = [],
+  isAscending = true,
+}) => {
+  return await deliveryModel
+    .find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort(
+      isAscending === 'true'
+        ? getSortAscending(sorted)
+        : getSortDescending(sorted)
+    )
+    .select(getUnSelectData(unSelect))
+    .lean();
+};
+
 module.exports = {
   createDelivery,
   findDeliveryById,
@@ -70,4 +96,5 @@ module.exports = {
   getAllDeliveriesByFilter,
   updateDeliveryById,
   deleteDeliveryById,
+  getDeliveriesByUser,
 };
