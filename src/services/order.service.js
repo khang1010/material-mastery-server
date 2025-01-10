@@ -18,6 +18,7 @@ const ProductService = require('./product.service');
 const { findUserById } = require('../models/repositories/user');
 const RouteService = require('./route.service');
 const orderModel = require('../models/order.model');
+const UserFactory = require('./user.service');
 
 class OrderService {
   static getOrdersByCustomer = async (payload) => {
@@ -322,6 +323,10 @@ class OrderService {
   static getNearbyOrders = async (orders, radius) => {
     const nearbyOrders = [];
 
+    const allCustomers = await UserFactory.getAllUsersWithoutPagination({
+      select: ['_id', 'username', 'email', 'display_name'],
+    });
+
     // Tìm các đơn hàng khác trong cơ sở dữ liệu
     const candidates = await getOrdersByNotIds(
       orders.map((order) => order._id),
@@ -354,10 +359,20 @@ class OrderService {
 
         // Nếu khoảng cách nằm trong bán kính, thêm vào danh sách
         if (distance <= radius) {
+          const customer = allCustomers.find(
+            (customer) =>
+              customer._id.toString() === candidate.order_userId.toString()
+          );
+          candidate.order_username = customer.username;
+          candidate.user_display_name = customer.display_name;
+          candidate.distance = distance;
           nearbyOrder.nearbyOrders.push(candidate);
           nearbyOrder.nearbyOrderIds.push(candidate._id);
         }
       }
+
+      // Sắp xếp nearbyOrders theo khoảng cách (distance)
+      nearbyOrder.nearbyOrders.sort((a, b) => a.distance - b.distance);
 
       nearbyOrders.push(nearbyOrder);
     }
@@ -365,16 +380,23 @@ class OrderService {
     return nearbyOrders;
   };
 
-  static getNearbyOrdersByIds = async (orderIds, radius, query) => {
+  static getNearbyOrdersByIds = async (orderIds, radius, query = {}) => {
     const orders = await getOrdersByIds(orderIds);
-    const { limit = 10, page = 1 } = query;
+    const { limit, page } = query;
     const nearbyOrders = await this.getNearbyOrders(orders, radius);
-    console.log('>>>', nearbyOrders.length);
 
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
+    if (!limit || !page) return nearbyOrders;
 
-    return nearbyOrders.slice(startIndex, endIndex);
+    const startIndex = (+page - 1) * +limit;
+    const endIndex = +startIndex + +limit;
+
+    const result = nearbyOrders.map((order) => {
+      const newNearbyOrders = order.nearbyOrders.slice(startIndex, endIndex);
+      return { ...order, nearbyOrders: newNearbyOrders };
+    });
+
+    // return nearbyOrders.slice(startIndex, endIndex);
+    return result;
   };
 }
 

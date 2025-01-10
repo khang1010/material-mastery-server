@@ -5,8 +5,10 @@ const {
   getSortAscending,
   getUnSelectData,
   getSortDescending,
+  getSelectData,
 } = require('../../utils');
 const { user } = require('../user.model');
+const { BadRequestError } = require('../../core/error-response');
 
 const findByEmailOrUsername = async (userInfo) => {
   return await user
@@ -19,12 +21,18 @@ const findUserById = async (user_id) => {
 };
 
 const updateUserById = async (user_id, model, payload) => {
-  const { password } = payload;
+  const { password, address_info } = payload;
+  const { longitude, latitude } = address_info;
   let passwordHash = undefined;
   if (password) {
     //Hash password
     passwordHash = await bcrypt.hash(password, 10);
   }
+  if (address_info) {
+    if (!longitude || !latitude)
+      throw new BadRequestError('Please provide longitude and latitude');
+  }
+
   return await model.findByIdAndUpdate(
     user_id,
     { ...payload, password: passwordHash },
@@ -54,9 +62,14 @@ const getAllUsers = async ({
     .lean();
 };
 
+const getAllUsersWithoutPagination = async ({ filter = {}, select = [] }) => {
+  return await user.find(filter).select(getSelectData(select)).lean();
+};
+
 module.exports = {
   findByEmailOrUsername,
   updateUserById,
   findUserById,
   getAllUsers,
+  getAllUsersWithoutPagination,
 };

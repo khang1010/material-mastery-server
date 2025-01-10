@@ -5,6 +5,7 @@ const {
   updateUserById,
   findUserById,
   getAllUsers,
+  getAllUsersWithoutPagination,
 } = require('../models/repositories/user');
 const { user, customer, staff, manager } = require('../models/user.model');
 const { removeUndefinedObject, updateNestedObject } = require('../utils');
@@ -66,6 +67,10 @@ class UserFactory {
       ...payload,
       filter: { roles: { $in: [role] } },
     });
+  }
+
+  static async getAllUsersWithoutPagination(payload) {
+    return await getAllUsersWithoutPagination(payload);
   }
 }
 
