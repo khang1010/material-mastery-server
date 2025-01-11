@@ -1,5 +1,6 @@
 'use strict';
 const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
 
 // Cấu hình Cloudinary
 cloudinary.config({
