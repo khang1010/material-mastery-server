@@ -12,6 +12,11 @@ const { createInventory } = require('./inventory');
 const { NotFoundError } = require('../../core/error-response');
 const { cloudinaryUploader } = require('../../configs/config-cloudinary');
 const { decodeBase64ForMulter } = require('../../configs/config-multer');
+const {
+  checkProductExists,
+  deleteProductInStaffNotification,
+  createOrUpdateNotificationByType,
+} = require('./notification');
 
 const findProductByName = async (product_name) => {
   return await product.findOne({ product_name }).lean();
@@ -125,6 +130,13 @@ const publishProduct = async ({ id }) => {
   foundProduct.isDraft = false;
 
   const { modifiedCount } = await foundProduct.updateOne(foundProduct);
+  if (foundProduct.product_quantity <= 5) {
+    await createOrUpdateNotificationByType({
+      type: 'STAFF',
+      content: 'STAFF-001',
+      option: { productId: foundProduct._id },
+    });
+  }
   return modifiedCount;
 };
 
@@ -134,6 +146,14 @@ const unPublishProduct = async ({ id }) => {
   foundProduct.isDraft = true;
 
   const { modifiedCount } = await foundProduct.updateOne(foundProduct);
+  if (
+    await checkProductExists('STAFF', foundProduct._id.toString(), 'STAFF-001')
+  ) {
+    await deleteProductInStaffNotification(
+      foundProduct._id.toString(),
+      'STAFF-001'
+    );
+  }
   return modifiedCount;
 };
 
