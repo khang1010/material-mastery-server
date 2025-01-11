@@ -22,15 +22,24 @@ const findUserById = async (user_id) => {
 
 const updateUserById = async (user_id, model, payload) => {
   const { password, address_info } = payload;
-  const { longitude, latitude } = address_info;
   let passwordHash = undefined;
+
   if (password) {
     //Hash password
     passwordHash = await bcrypt.hash(password, 10);
   }
-  if (address_info) {
-    if (!longitude || !latitude)
+
+  // Xử lý address_info nếu có
+  if (
+    'address_info.longitude' in payload &&
+    'address_info.latitude' in payload
+  ) {
+    const longitude = payload['address_info.longitude'];
+    const latitude = payload['address_info.latitude'];
+
+    if (!longitude || !latitude) {
       throw new BadRequestError('Please provide longitude and latitude');
+    }
   }
 
   return await model.findByIdAndUpdate(
