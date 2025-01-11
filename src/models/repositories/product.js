@@ -134,7 +134,7 @@ const publishProduct = async ({ id }) => {
     await createOrUpdateNotificationByType({
       type: 'STAFF',
       content: 'STAFF-001',
-      option: { productId: foundProduct._id },
+      option: { ...foundProduct, productId: foundProduct._id },
     });
   }
   return modifiedCount;
