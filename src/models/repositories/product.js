@@ -1,21 +1,21 @@
-'use strict'
+'use strict';
 
-const { Types } = require('mongoose')
+const { Types } = require('mongoose');
 const {
   getUnSelectData,
   getSelectData,
   getSortAscending,
   getSortDescending,
-} = require('../../utils')
-const { product } = require('../product.model')
-const { createInventory } = require('./inventory')
-const { NotFoundError } = require('../../core/error-response')
-const { cloudinaryUploader } = require('../../configs/config-cloudinary')
-const { decodeBase64ForMulter } = require('../../configs/config-multer')
+} = require('../../utils');
+const { product } = require('../product.model');
+const { createInventory } = require('./inventory');
+const { NotFoundError } = require('../../core/error-response');
+const { cloudinaryUploader } = require('../../configs/config-cloudinary');
+const { decodeBase64ForMulter } = require('../../configs/config-multer');
 
 const findProductByName = async (product_name) => {
-  return await product.findOne({ product_name }).lean()
-}
+  return await product.findOne({ product_name }).lean();
+};
 
 const createProduct = async ({
   name,
@@ -38,13 +38,13 @@ const createProduct = async ({
     product_unit: unit,
     product_categories: categories,
     isDraft: isDraft,
-  })
+  });
   const newInventory = await createInventory({
     productId: newProduct._id,
     stock: newProduct.product_quantity,
-  })
-  return newProduct
-}
+  });
+  return newProduct;
+};
 const createProductV2 = async ({
   name,
   description = '',
@@ -57,9 +57,9 @@ const createProductV2 = async ({
   originalname,
   buffer,
 }) => {
-  const file = decodeBase64ForMulter(originalname, buffer).content
-  const uploadImageResult = await cloudinaryUploader.upload(file)
-  let product_thumb = uploadImageResult.url
+  const file = decodeBase64ForMulter(originalname, buffer).content;
+  const uploadImageResult = await cloudinaryUploader.upload(file);
+  let product_thumb = uploadImageResult.url;
   const newProduct = await product.create({
     product_name: name,
     product_thumb: product_thumb,
@@ -70,32 +70,32 @@ const createProductV2 = async ({
     product_unit: unit,
     product_categories: categories,
     isDraft: isDraft,
-  })
+  });
   const newInventory = await createInventory({
     productId: newProduct._id,
     stock: newProduct.product_quantity,
-  })
-  return newProduct
-}
+  });
+  return newProduct;
+};
 
 const getAllProduct = async () => {
-  return await product.find().lean()
-}
+  return await product.find().lean();
+};
 
 const updateProductById = async (productId, payload) => {
-  return await product.findByIdAndUpdate(productId, payload, { new: true })
-}
+  return await product.findByIdAndUpdate(productId, payload, { new: true });
+};
 
 const deleteProductById = async (productId) => {
-  return await product.findByIdAndDelete(productId)
-}
+  return await product.findByIdAndDelete(productId);
+};
 
-const getProductById = async (productId, select) => {
+const getProductById = async (productId, unSelect) => {
   return await product
     .findById(productId)
-    .select(getUnSelectData(select))
-    .lean()
-}
+    .select(getUnSelectData(unSelect))
+    .lean();
+};
 
 const getAllProductsByUser = async ({
   limit = 50,
@@ -113,29 +113,29 @@ const getAllProductsByUser = async ({
     .sort(
       isAscending === 'true'
         ? getSortAscending(sorted)
-        : getSortDescending(sorted),
+        : getSortDescending(sorted)
     )
     .select(getUnSelectData(unSelect))
-    .lean()
-}
+    .lean();
+};
 
 const publishProduct = async ({ id }) => {
-  const foundProduct = await product.findById(id)
-  if (!foundProduct) throw new NotFoundError('Product not found')
-  foundProduct.isDraft = false
+  const foundProduct = await product.findById(id);
+  if (!foundProduct) throw new NotFoundError('Product not found');
+  foundProduct.isDraft = false;
 
-  const { modifiedCount } = await foundProduct.updateOne(foundProduct)
-  return modifiedCount
-}
+  const { modifiedCount } = await foundProduct.updateOne(foundProduct);
+  return modifiedCount;
+};
 
 const unPublishProduct = async ({ id }) => {
-  const foundProduct = await product.findById(id)
-  if (!foundProduct) throw new NotFoundError('Product not found')
-  foundProduct.isDraft = true
+  const foundProduct = await product.findById(id);
+  if (!foundProduct) throw new NotFoundError('Product not found');
+  foundProduct.isDraft = true;
 
-  const { modifiedCount } = await foundProduct.updateOne(foundProduct)
-  return modifiedCount
-}
+  const { modifiedCount } = await foundProduct.updateOne(foundProduct);
+  return modifiedCount;
+};
 
 const checkProductByServer = async (products) => {
   return await Promise.all(
@@ -146,16 +146,16 @@ const checkProductByServer = async (products) => {
         '__v',
         'product_slug',
         '_id',
-      ])
-      if (!foundProduct) throw new NotFoundError('Product not found')
+      ]);
+      if (!foundProduct) throw new NotFoundError('Product not found');
       return {
         product_price: foundProduct.product_price,
         product_quantity: product.quantity,
         productId: product.productId,
-      }
-    }),
-  )
-}
+      };
+    })
+  );
+};
 
 const getNumberOfProducts = async (isDraft) => {
   const totalProducts = await product.aggregate([
@@ -170,9 +170,9 @@ const getNumberOfProducts = async (isDraft) => {
         totalBills: { $sum: 1 },
       },
     },
-  ])
-  return totalProducts.length ? totalProducts[0].totalBills : 0
-}
+  ]);
+  return totalProducts.length ? totalProducts[0].totalBills : 0;
+};
 
 const getNumberOfProductsByCategory = async (category, isDraft) => {
   const totalProducts = await product.aggregate([
@@ -188,12 +188,12 @@ const getNumberOfProductsByCategory = async (category, isDraft) => {
         totalBills: { $sum: 1 },
       },
     },
-  ])
-  return totalProducts.length ? totalProducts[0].totalBills : 0
-}
+  ]);
+  return totalProducts.length ? totalProducts[0].totalBills : 0;
+};
 
 const searchProductsByUser = async ({ keySearch, isDraft = false }) => {
-  const regexSearch = new RegExp(keySearch)
+  const regexSearch = new RegExp(keySearch);
   return await product
     .find(
       {
@@ -202,11 +202,11 @@ const searchProductsByUser = async ({ keySearch, isDraft = false }) => {
           $search: regexSearch,
         },
       },
-      { score: { $meta: 'textScore' } },
+      { score: { $meta: 'textScore' } }
     )
     .sort({ score: { $meta: 'textScore' } })
-    .lean()
-}
+    .lean();
+};
 
 module.exports = {
   findProductByName,
@@ -223,5 +223,4 @@ module.exports = {
   getNumberOfProductsByCategory,
   searchProductsByUser,
   createProductV2,
-}
-
+};

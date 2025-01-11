@@ -43,7 +43,6 @@ var productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
       index: true,
-      select: false,
     },
     product_categories: {
       type: Array,
