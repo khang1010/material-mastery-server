@@ -134,7 +134,7 @@ const publishProduct = async ({ id }) => {
     await createOrUpdateNotificationByType({
       type: 'STAFF',
       content: 'STAFF-001',
-      option: { ...foundProduct, productId: foundProduct._id },
+      option: { ...foundProduct._doc, productId: foundProduct._id },
     });
   }
   return modifiedCount;
@@ -146,9 +146,12 @@ const unPublishProduct = async ({ id }) => {
   foundProduct.isDraft = true;
 
   const { modifiedCount } = await foundProduct.updateOne(foundProduct);
-  if (
-    await checkProductExists('STAFF', foundProduct._id.toString(), 'STAFF-001')
-  ) {
+  const isExistNotification = await checkProductExists(
+    'STAFF',
+    foundProduct._id.toString(),
+    'STAFF-001'
+  );
+  if (isExistNotification) {
     await deleteProductInStaffNotification(
       foundProduct._id.toString(),
       'STAFF-001'
