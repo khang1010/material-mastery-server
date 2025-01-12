@@ -15,7 +15,7 @@ class ProductController {
       message: 'Create product successfully',
       metadata: await ProductService.createProduct({
         ...req.body,
-        thumb: req.file.path,
+        thumb: req?.file?.path,
       }),
     }).send(res);
   };
