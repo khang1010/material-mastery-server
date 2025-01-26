@@ -35,7 +35,7 @@ class RouteService {
     return await updatePheromone(route, rating);
   }
 
-  static async calculateRoute(locations, antNum = 10) {
+  static async calculateRoute(locations, antNum = 13) {
     await initializePheromones(locations);
     // Lấy dữ liệu pheromone từ DB
     const pheromones = await this.getPheromonesForLocations(locations);
@@ -71,31 +71,45 @@ class RouteService {
         );
       }
 
-      // Tinh chỉnh lộ trình với 2-opt
-      const optimizedRoute = this.apply2Opt(route);
-
       // const routeDistance = this.calculateTotalDistance(route);
       // Tính điểm của tuyến đường hiện tại
-      const routeScore = this.calculateRouteScore(optimizedRoute, pheromones);
+      const routeScore = this.calculateRouteScore(route, pheromones);
       if (routeScore > bestScore) {
-        bestRoute = [...optimizedRoute];
+        bestRoute = [...route];
         bestScore = routeScore;
       }
     }
 
-    const routeDistance = this.calculateTotalDistance(bestRoute);
-    await globalPheromoneUpdateV2(bestRoute, pheromones, 0.05, routeDistance);
+    // Tinh chỉnh lộ trình với 2-opt
+    const optimizedRoute = await this.apply2Opt(bestRoute, pheromones);
+    const bestDistance = await this.calculateTotalDistanceV2(optimizedRoute, pheromones);
+    const routeDistance = await this.calculateTotalDistanceV2(bestRoute, pheromones);
+    await globalPheromoneUpdate(bestRoute || optimizedRoute, pheromones, optimizedRoute, 0.05, routeDistance, bestDistance);
 
     // const optimizedRoute = this.apply2Opt(bestRoute);
-    return bestRoute;
+    return bestRoute || optimizedRoute;
   }
 
-  static calculateTotalDistance(route) {
+  static async calculateTotalDistance(route) {
     let totalDistance = 0;
     for (let i = 0; i < route.length - 1; i++) {
       const fromLocation = route[i];
       const toLocation = route[i + 1];
-      const pheromoneRecord = getPheromone(fromLocation, toLocation);
+      const pheromoneRecord = await getPheromone(fromLocation, toLocation);
+      if (pheromoneRecord) {
+        totalDistance += pheromoneRecord.distance;
+      }
+    }
+    return totalDistance;
+  }
+  
+  static async calculateTotalDistanceV2(route, pheromones) {
+    let totalDistance = 0;
+    for (let i = 0; i < route.length - 1; i++) {
+      const fromLocation = route[i];
+      const toLocation = route[i + 1];
+      const key = `${fromLocation}-${toLocation}`;
+      const pheromoneRecord = pheromones[key] ? pheromones[key] : await getPheromone(fromLocation, toLocation);
       if (pheromoneRecord) {
         totalDistance += pheromoneRecord.distance;
       }
@@ -103,23 +117,23 @@ class RouteService {
     return totalDistance;
   }
 
-  static apply2Opt(route) {
-    let improved = true;
-    while (improved) {
-      improved = false;
+  static async apply2Opt(route, pheromones) {
+    // let improved = true;
+    // while (improved) {
+    //   improved = false;
       for (let i = 1; i < route.length - 2; i++) {
         for (let j = i + 1; j < route.length - 1; j++) {
           const newRoute = this.swap2Opt(route, i, j);
           if (
-            this.calculateTotalDistance(newRoute) <
-            this.calculateTotalDistance(route)
+            await this.calculateTotalDistanceV2(newRoute, pheromones) <
+            await this.calculateTotalDistanceV2(route, pheromones)
           ) {
             route = newRoute;
-            improved = true;
+            // improved = true;
           }
         }
       }
-    }
+    // }
     return route;
   }
 
@@ -133,7 +147,7 @@ class RouteService {
     return newRoute;
   }
 
-  static calculateRouteScore(route, pheromones, alpha = 1, beta = 2) {
+  static calculateRouteScore(route, pheromones, alpha = 1, beta = 1) {
     let totalScore = 0;
 
     for (let i = 0; i < route.length - 1; i++) {
@@ -142,7 +156,7 @@ class RouteService {
       const key = `${fromLocation}-${toLocation}`;
       const { pheromone, heuristic } = pheromones[key] || {
         pheromone: 1,
-        heuristic: 1 / this.calculateTotalDistance([fromLocation, toLocation]),
+        heuristic: 1,
       };
 
       // Tính điểm dựa trên pheromone và heuristic
@@ -159,7 +173,7 @@ class RouteService {
     Q = 100
   ) {
     const updates = [];
-    const bestDistance = this.calculateTotalDistance(bestRoute);
+    const bestDistance = await this.calculateTotalDistanceV2(bestRoute, pheromones);
 
     // Bay hơi pheromone trên tất cả các tuyến đường
     for (const key in pheromones) {
