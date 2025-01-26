@@ -294,7 +294,7 @@ class OrderService {
       const { longitude, latitude } = order.order_address;
       if (!longitude || !latitude)
         throw new BadRequestError('Address not found');
-      locations.push(`${longitude},${latitude}`);
+      locations.push(`${latitude},${longitude}`);
     });
 
     const route = RouteService.calculateRoute(locations);
